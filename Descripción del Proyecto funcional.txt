@@ -1,0 +1,10 @@
+Crear un # Documento de Especificación de Requerimientos (ERS) - Enterprise Edition, para este proyecto de appweb:
+
+Plataforma web abierta a la comunidad de gimnasios que permite acceso a los clientes a múltiples gimnasios y estudios de bienestar fisico y mental. Permitiendo que un cliente pueda crear una membresia y con ella pueda tomar clases o los servicios de cualquiera de los gimnasios que son parte de la plataforma.
+
+Teniendo en cuenta estos requerimientos:
+**Proyecto:** AppGymHub - Membresia universal de gimnasios
+**Versión:** 1.0 (Preparado para Auditoría y Escalabilidad)
+**Stack:** React, Tachyons, Supabase (PostgreSQL, Auth, RLS, Edge Functions)
+
+

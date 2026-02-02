@@ -1,0 +1,94 @@
+  Ahora, el siguiente paso crucial es la integración con Mercadopago. Esto involucra dos partes:
+
+   1. Frontend: El CheckoutPage.jsx (que ya creamos) se encargará de llamar a una función backend para obtener la URL de pago de Mercadopago y redirigir al
+      usuario.
+   2. Backend (Supabase Edge Function): Necesitamos una función serverless (Edge Function) en Supabase que:
+       * Reciba los detalles del plan y del usuario.
+       * Interacte con la API de Mercadopago para crear una "preferencia de pago".
+       * Devuelva la URL de checkout de Mercadopago al frontend.
+       * Además, necesitaremos otra Edge Function para manejar los webhooks de Mercadopago, que nos notificarán cuando un pago sea exitoso y nos permitirán
+         actualizar el estado de la membresía del usuario en nuestra base de datos.
+
+  Para la integración con Mercadopago, ¿podrías proporcionarme tus credenciales de API de Mercadopago (Client ID y Client Secret)? Estas se almacenarán de
+  forma segura en la configuración de Supabase.
+
+  Mientras tanto, voy a preparar el código SQL para la función RPC create_mercadopago_preference que CheckoutPage.jsx llama actualmente.Para que la
+  integración de Mercadopago funcione, necesitamos dos cosas:
+
+   1. Credenciales de Mercadopago: Necesitaré tu Client ID y Client Secret de Mercadopago para poder configurar las llamadas a su API. Estas credenciales se
+      almacenarán de forma segura en la configuración de Supabase.
+   2. Función RPC `create_mercadopago_preference`: Aunque CheckoutPage.jsx ya llama a esta función, esta función debe existir en Supabase y estar
+      configurada para interactuar con Mercadopago.
+
+  Procederé a crear el script SQL para la función RPC create_mercadopago_preference. Esta función se encargará de generar la URL de pago de Mercadopago.
+
+  Una vez que tengas las credenciales de Mercadopago y las hayas configurado en Supabase (como variables de entorno o secretos), podrás reemplazar los
+  valores de ejemplo en la función SQL.
+
+  Aquí está el script SQL para la función create_mercadopago_preference:
+
+-- Esto es un placeholder. En un escenario real, esta función interactuaría con la API de Mercadopago.
+-- Para que funcione, necesitarás la extensión 'http' habilitada en Supabase si usas Edge Functions para las llamadas directas.
+-- De lo contrario, esta función RPC simula la creación de una preferencia y retorna una URL dummy.
+
+CREATE OR REPLACE FUNCTION create_mercadopago_preference(
+    p_user_id UUID,
+    p_plan_id BIGINT,
+    p_price NUMERIC,
+    p_plan_name TEXT
+)
+RETURNS TABLE (checkout_url TEXT)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_mercadopago_access_token TEXT; -- Debería obtenerse de las variables de entorno de Supabase
+    v_mercadopago_base_url TEXT;     -- Debería obtenerse de las variables de entorno de Supabase
+    v_preference_data JSONB;
+    v_response JSONB;
+    v_checkout_url TEXT;
+BEGIN
+    -- !!! IMPORTANTE !!!
+    -- Estas variables (v_mercadopago_access_token, v_mercadopago_base_url)
+    -- deben obtenerse de las variables de entorno de Supabase (ej: supabase.env.MERCDOPAGO_ACCESS_TOKEN).
+    -- Para este ejemplo, usaremos valores dummy.
+
+    -- EJEMPLO SIMULADO (NO FUNCIONARÁ SIN CREDENCIALES REALES Y LLAMADA EXTERNA)
+    -- En un caso real, usarías una librería o haría una petición HTTP a la API de Mercadopago.
+    -- Ejemplo con librerías: require('mercadopago'); mercadopago.configure({access_token: 'YOUR_ACCESS_TOKEN'});
+    -- Ejemplo de llamada API:
+    /*
+    v_mercadopago_access_token := supabase.env.MERCDOPAGO_ACCESS_TOKEN;
+    v_mercadopago_base_url := 'https://api.mercadopago.com/v1/preferences';
+
+    v_preference_data := jsonb_build_object(
+        'items', jsonb_build_array(
+            jsonb_build_object(
+                'title', p_plan_name,
+                'quantity', 1,
+                'currency_id', 'ARS', -- O la moneda correspondiente
+                'unit_price', p_price
+            )
+        ),
+        'external_reference', p_user_id || '-' || p_plan_id || '-' || date_part('epoch', NOW())::bigint, -- Referencia externa para seguimiento
+        'notification_url', supabase.env.SUPABASE_URL || '/api/webhooks/mercadopago' -- URL de tu webhook
+    );
+
+    -- La llamada HTTP a Mercadopago es compleja y requiere extensiones o Edge Functions para hacerla desde SQL.
+    -- Por simplicidad, aquí simulamos el resultado.
+    */
+
+    -- Simulación: Retornar una URL dummy de Mercadopago
+    v_checkout_url := 'https://www.mercadopago.com.ar/checkout/pay?pref_id=dummy_preference_id_simulated'; -- Reemplazar con la URL real
+
+    RETURN QUERY SELECT v_checkout_url AS checkout_url;
+END;
+$$;
+
+-- NOTA: Para que esto funcione completamente, necesitarás:
+-- 1. Configurar tus credenciales de Mercadopago (Client ID, Secret Key) como variables de entorno en Supabase.
+-- 2. Implementar una Edge Function (o un servicio externo) que reciba el callback de Mercadopago (webhook)
+--    y actualice la tabla 'user_memberships' en tu base de datos.
+-- 3. En este ejemplo, la función RPC simula la creación de la preferencia y retorna una URL dummy.
+
+  Por favor, ejecuta este script en tu Editor SQL de Supabase. Una vez hecho esto, el siguiente paso será implementar la lógica del webhook para la
+  confirmación del pago.
