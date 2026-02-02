@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
+import ClassCard from "../components/ClassCard";
 
 const GymOwnerClassManagementPage = () => {
   const { session } = useAuth();

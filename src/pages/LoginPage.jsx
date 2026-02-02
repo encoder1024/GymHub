@@ -10,23 +10,27 @@ const LoginPage = () => {
   const [error, setError] = useState(null);
 
   const handleLogin = async (e) => {
+    
     e.preventDefault();
     setError(null);
     setLoading(true);
+
     try {
       console.log('Attempting login with:', { email, password });
-      const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
-      
-      console.log('Supabase signInWithPassword result:', { data, authError });
 
-      if (authError) {
-        throw authError;
+      const { data, error: apiError } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (apiError) {
+        throw apiError;
       }
+
       console.log('Login successful, navigating to /profile');
       navigate('/profile'); // Redirige al perfil si el login es exitoso
-    } catch (error) {
-      console.error('Login error:', error.message);
-      setError(error.message);
+      console.log('Supabase signInWithPassword result:', { data, apiError });
+
+    } catch (err) {
+      console.error('Login error:', err.message);
+      setError(err.message);
     } finally {
       setLoading(false);
       console.log('Login process finished, loading set to false.');
