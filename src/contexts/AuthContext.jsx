@@ -1,71 +1,66 @@
-import { createContext, useContext, useEffect, useState, useMemo } from 'react';
-import { supabase } from '../supabaseClient';
+import { useEffect, useState, useMemo } from "react";
+import { supabase } from "../supabaseClient";
+import { fetchUserProfile } from "../services/profileService";
+import { FullContext } from "./FullContext"; // Importamos el objeto
 
-const AuthContext = createContext();
+// export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [session, setSession] = useState(null);
+  // 1. Inicialización Sincrónica de la Sesión
+  const [session, setSession] = useState(() => {
+    // BUSCÁ ESTA KEY EN TU NAVEGADOR (F12 -> Application -> Local Storage)
+    // Suele ser: sb-[TU-PROJECT-ID]-auth-token
+    const saved = localStorage.getItem("sb-ougtipazurskmbtasbfl-auth-token");
+    return saved ? JSON.parse(saved) : null;
+  });
+
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true); // Initial loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
+    let mounted = true;
 
-        if (session?.user) {
-          try {
-            const { data, error } = await supabase
-              .from('profiles')
-              .select('role, full_name, avatar_url')
-              .eq('id', session.user.id)
-              .limit(1) // Ensure only one row is expected
-              .maybeSingle(); // Returns null if no row, or the single row. Throws if multiple.
-            
-            if (error) {
-              console.error("AuthContext: Error fetching profile:", error.message);
-              setProfile(null);
-              console.warn("AuthContext: Profile fetch failed for existing session. Forcing logout.");
-              await supabase.auth.signOut();
-            } else if (data) {
-              setProfile(data);
-            } else {
-              console.warn("AuthContext: No profile found for user ID:", session.user.id, "despite SIGNED_IN. Forcing logout.");
-              setProfile(null);
-              await supabase.auth.signOut();
-            }
-          } catch (error) {
-            console.error("AuthContext: Critical error during profile fetch:", error.message);
-            setProfile(null);
-            console.warn("AuthContext: Critical error during profile fetch. Forcing logout.");
-            await supabase.auth.signOut();
-          }
+    const initialize = async () => {
+      try {
+        const { data: { session: curr } } = await supabase.auth.getSession();
+        if (!mounted) return;
+
+        if (curr) {
+          setSession(curr);
+          // USÁS EL SERVICIO EXTERNO
+          const profileData = await fetchUserProfile(curr.user.id);
+          if (profileData) setProfile(profileData);
         }
-        else {
-          setProfile(null);
-        }
-        setLoading(false); // Set loading to false after all async operations are done.
+      } finally {
+        if (mounted) setLoading(false);
       }
-    );
+    }
+
+    initialize();
+
+    // Suscripción para cambios futuros (Login/Logout/Refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      if (event === 'SIGNED_OUT') {
+        setSession(null);
+        setProfile(null);
+        setLoading(false);
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        setSession(newSession);
+        // Aquí podrías re-fetch profile si es necesario
+      }
+    });
 
     return () => {
+      mounted = false;
       subscription?.unsubscribe();
     };
   }, []);
 
-  const value = useMemo(() => ({
-    session,
-    profile,
-    loading,
-  }), [session, profile, loading]);
+  const value = useMemo(() => ({ session, profile, loading }), [session, profile, loading]);
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <FullContext.Provider value={value}>{children}</FullContext.Provider>;
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+
+
+

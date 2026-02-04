@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+// import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom'; // Importar useNavigate
-import { supabase } from '../supabaseClient';
-import { useAuth } from '../contexts/AuthContext'; // Para verificar la sesión
+// import { supabase } from '../supabaseClient';
+import { useAuth } from '../hooks/useAuth'; // Para verificar la sesión
 
 const MembershipPage = () => {
   const navigate = useNavigate();
