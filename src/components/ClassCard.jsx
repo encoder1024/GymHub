@@ -9,8 +9,8 @@ const ClassCard = ({ classInfo, onBook }) => {
   const isReservable = new Date(classInfo.start_time) > new Date(); 
 
   return (
-    <div className="bg-white shadow-1 br2 pa3 ma2 w-100 w-40-m w-30-l flex flex-column justify-between">
-      <h3 className="f4 mv0">{classInfo.name}</h3>
+    <div className="bg-white shadow-1 br3 w-100 w-100-m w-30-l flex flex-column justify-between">
+      <h3 className="pa1 f4 mv0">{classInfo.name}</h3>
       <p className="f6 lh-copy measure mid-gray">{classInfo.description}</p>
       <p className="f6 mt2">
         <strong>Horario:</strong> {startTime} - {endTime}
