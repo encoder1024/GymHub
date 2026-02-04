@@ -1,28 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import "leaflet-defaulticon-compatibility";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom"; // Importar useNavigate
 import { supabase } from "../supabaseClient";
 import GymCard from "../components/GymCard";
 import ClassCard from "../components/ClassCard"; // Importar ClassCard
-import { icon } from "leaflet";
 
-import L from 'leaflet';
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
 import MapLibreMapComponent from '../components/MapLibreMapComponent';
 
-// Corrige la ruta por defecto que usa Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconUrl: markerIcon,
-  iconRetinaUrl: markerIcon2x,
-  shadowUrl: markerShadow,
-});
 
 const GymsPage = () => {
   const { session } = useAuth();
@@ -31,7 +16,6 @@ const GymsPage = () => {
   const [gyms, setGyms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [map, setMap] = useState(null);
 
   // Mock classes data for demonstration, this would ideally come from DB
   const mockGymData = [
@@ -174,23 +158,6 @@ const GymsPage = () => {
     }
   };
 
-  // Función para centrar el mapa en una ubicación dada
-  const centerMap = (lat, lng) => {
-    if (map) {
-      map.setView([lat, lng], 13); // Zoom level 13
-    }
-  };
-
-  const position = [-34.6037, -58.3816];
-
-  const customIcon = icon({
-    iconUrl: "https://unpkg.com",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowUrl: "https://unpkg.com",
-    shadowSize: [41, 41],
-  });
 
   return (
     <div className="pa4">
@@ -201,82 +168,8 @@ const GymsPage = () => {
 
       <MapLibreMapComponent></MapLibreMapComponent>
 
-      <div style={{ height: "500px", width: "100%" }}>
-        <MapContainer
-          center={position}
-          zoom={13}
-          scrollWheelZoom={false}
-          style={{ height: "500px", width: "100%" }}
-        >
-          {/* Capa de OpenStreetMap */}
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          {/* Marcador interactivo */}
-          <Marker position={position} icon={customIcon}>
-            <Popup>¡Hola! Este es un marcador en JSX.</Popup>
-          </Marker>
-        </MapContainer>
-      </div>
-
       <div className="flex flex-wrap">
         {/* Sección del Mapa */}
-        <div className="w-100 w-60-l mr-auto-l mb4">
-          <h2 className="f3">Mapa</h2>
-          <div style={{ height: "500px", width: "100%" }}>
-            <MapContainer
-              center={
-                userLocation
-                  ? [userLocation.lat, userLocation.lng]
-                  : [-34.6037, -58.3816]
-              } // Centro por defecto (Buenos Aires) si no hay ubicación
-              zoom={13}
-              style={{ height: "100%", width: "100%" }}
-              whenCreated={setMap} // Guarda la instancia del mapa en el estado
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              {/* Marcador para la ubicación del usuario si está disponible */}
-              {userLocation && (
-                <Marker position={[userLocation.lat, userLocation.lng]}>
-                  <Popup>Tu ubicación actual.</Popup>
-                </Marker>
-              )}
-              {/* Marcadores para los gimnasios encontrados */}
-              {gyms.map(
-                (gym) =>
-                  gym.location_coords && ( // Asegurarse de que el gimnasio tiene coordenadas
-                    <Marker
-                      key={gym.id}
-                      position={[
-                        gym.location_coords.coordinates[1],
-                        gym.location_coords.coordinates[0],
-                      ]} // Leaflet usa [lat, lng]
-                    >
-                      <Popup>
-                        {/* Aquí podemos renderizar información o un link a la página de detalle del gym */}
-                        <div className="f6">
-                          <strong>{gym.name}</strong>
-                          <p className="mt1">{gym.description}</p>
-                          {/* Pasar onBook prop a GymCard si GymCard va a renderizar ClassCards */}
-                          <GymCard
-                            gym={gym}
-                            onBook={handleBookClass} // Pasar la función de reserva
-                          />
-                          <p className="mt2 f7 gray">
-                            Distancia: {(gym.dist_meters / 1000).toFixed(2)} km
-                          </p>
-                        </div>
-                      </Popup>
-                    </Marker>
-                  ),
-              )}
-            </MapContainer>
-          </div>
-        </div>
 
         {/* Sección de Lista de Gimnasios */}
         <div className="w-100 w-40-l pl3-l">
@@ -299,13 +192,13 @@ const GymsPage = () => {
                   </p>
                   <button
                     className="bn bg-transparent pointer blue f6"
-                    onClick={() =>
-                      gym.location_coords &&
-                      centerMap(
-                        gym.location_coords.coordinates[1],
-                        gym.location_coords.coordinates[0],
-                      )
-                    }
+                    // onClick={() =>
+                    //   gym.location_coords &&
+                    //   centerMap(
+                    //     gym.location_coords.coordinates[1],
+                    //     gym.location_coords.coordinates[0],
+                    //   )
+                    // }
                   >
                     Ver en el mapa
                   </button>
