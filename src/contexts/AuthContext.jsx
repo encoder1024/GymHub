@@ -20,47 +20,78 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     let mounted = true;
 
-    const initialize = async () => {
-      try {
-        const { data: { session: curr } } = await supabase.auth.getSession();
-        if (!mounted) return;
+    // ESTA ES TU ÚNICA FUENTE DE VERDAD
+  const handleAuth = async (currentSession) => {
+    if (!mounted) return;
+    
+    // IMPORTANTE: No pongas setLoading(true) aquí adentro si ya viene de initialize
+    // para evitar "parpadeos" innecesarios si la sesión es null.
+    setSession(currentSession);
 
-        if (curr) {
-          setSession(curr);
-          // USÁS EL SERVICIO EXTERNO
-          const profileData = await fetchUserProfile(curr.user.id);
-          if (profileData) setProfile(profileData);
-        }
-      } finally {
-        if (mounted) setLoading(false);
+    try {
+      if (currentSession?.user) {
+        const profileData = await fetchUserProfile(currentSession.user.id);
+        if (mounted) setProfile(profileData);
+      } else {
+        if (mounted) setProfile(null);
       }
+    } catch (err) {
+      console.error("Error en perfil:", err);
+    } finally {
+      // ESTA LÍNEA ES LA QUE DESBLOQUEA EL F5
+      if (mounted) setLoading(false);
     }
+  };
 
+    // Ejecución inicial segura
+  const initialize = async () => {
+    try {
+      // Usamos getUser() en lugar de getSession() para mayor seguridad en F5
+      // ya que getUser valida el token con el servidor
+      const { data: { user }, error } = await supabase.auth.getUser();
+      
+      if (error || !user) {
+        if (mounted) {
+          setSession(null);
+          setProfile(null);
+          setLoading(false);
+        }
+        return;
+      }
+
+      // Si hay usuario, buscamos la sesión completa y el perfil
+      const { data: { session: curr } } = await supabase.auth.getSession();
+      await handleAuth(curr);
+    } catch (err) {
+      if (mounted) setLoading(false);
+    }
+  };
     initialize();
 
-    // Suscripción para cambios futuros (Login/Logout/Refresh)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-      if (event === 'SIGNED_OUT') {
-        setSession(null);
-        setProfile(null);
-        setLoading(false);
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        setSession(newSession);
-        // Aquí podrías re-fetch profile si es necesario
-      }
-    });
+    // 2. Escucha de cambios (Login/Logout)
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+    // Evitamos procesar INITIAL_SESSION si initialize ya lo hizo
+    if (event === 'INITIAL_SESSION') return;
 
-    return () => {
-      mounted = false;
-      subscription?.unsubscribe();
-    };
-  }, []);
+    if (event === 'SIGNED_OUT') {
+      setSession(null);
+      setProfile(null);
+      setLoading(false);
+    } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      handleAuth(newSession);
+    }
+  });
 
-  const value = useMemo(() => ({ session, profile, loading }), [session, profile, loading]);
+  return () => {
+    mounted = false;
+    subscription?.unsubscribe();
+  };
+}, []);
+
+  const value = useMemo(
+    () => ({ session, profile, loading }),
+    [session, profile, loading],
+  );
 
   return <FullContext.Provider value={value}>{children}</FullContext.Provider>;
 };
-
-
-
-

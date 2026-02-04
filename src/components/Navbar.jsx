@@ -1,153 +1,104 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { supabase } from "../supabaseClient";
 
 const Navbar = () => {
-  const { session, profile, loading } = useAuth(); // Get loading state
+  const { session, profile, loading } = useAuth(); 
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/"); // Redirige a la página de inicio tras cerrar sesión
+    setIsOpen(false);
+    navigate("/");
   };
 
-  const renderAuthLinks = () => {
-    // If loading, show nothing specific to auth state yet, or a minimal loader
-    if (loading) {
-      return null; // Or <span className="f6 f5-l dib ml3">Cargando...</span>;
-    }
+  const getRoleLinks = () => {
+    // AHORA CHEQUEAMOS EXPLÍCITAMENTE SI EL PERFIL ESTÁ CARGADO
+    if (loading || !session || !profile?.role) return []; 
+    
+    const userRole = profile.role;
+    const links = [{ to: "/profile", label: "Mi Perfil" }];
 
-    if (session) {
-      const userRole = profile?.role;
-      const baseLinks = [
-        <Link
-          key="profile"
-          className="link dim dark-gray f6 f5-l dib mr3 mr4-l"
-          to="/profile"
-          title="Perfil"
-        >
-          Mi Perfil
-        </Link>,
-      ];
+    // ... (Tu lógica de roleSpecific queda igual) ...
+    const roleSpecific = {
+      admin: [
+        { to: "/admin/AdminGymApprovalPage", label: "Aprobar Gimnasios" },
+        { to: "/admin/AdminUserManagementPage", label: "Gestionar Usuarios" },
+        { to: "/admin/AdminMetricsDashboardPage", label: "Métricas" },
+      ],
+      owner: [
+        { to: "/gym-owner-dashboard", label: "Mi Gimnasio" },
+        { to: "/gym-owner-bookings", label: "Ver Reservas" },
+      ],
+      cliente: [
+        { to: "/my-bookings", label: "Mis Reservas" },
+      ],
+    };
 
-      const roleLinks = {
-        admin: [
-          <Link
-            key="admin-gym-approval"
-            className="link dim dark-gray f6 f5-l dib mr3 mr4-l"
-            to="/admin/AdminGymApprovalPage"
-            title="Aprobación Gimnasios"
-          >
-            Aprobar Gimnasios
-          </Link>,
-          <Link
-            key="admin-user-management"
-            className="link dim dark-gray f6 f5-l dib mr3 mr4-l"
-            to="/admin/AdminUserManagementPage"
-            title="Gestión Usuarios"
-          >
-            Gestionar Usuarios
-          </Link>,
-          <Link
-            key="admin-metrics"
-            className="link dim dark-gray f6 f5-l dib mr3 mr4-l"
-            to="/admin/AdminMetricsDashboardPage"
-            title="Dashboard Métricas"
-          >
-            Métricas
-          </Link>,
-        ],
-        owner: [
-          <Link
-            key="owner-dashboard"
-            className="link dim dark-gray f6 f5-l dib mr3 mr4-l"
-            to="/gym-owner-dashboard"
-            title="Dashboard Gimnasio"
-          >
-            Mi Gimnasio
-          </Link>,
-          // <Link key="owner-classes" className="link dim dark-gray f6 f5-l dib mr3 mr4-l" to="/gym-owner-classes" title="Gestionar Clases">
-          //   Mis Clases
-          // </Link>,
-          <Link
-            key="owner-bookings"
-            className="link dim dark-gray f6 f5-l dib mr3 mr4-l"
-            to="/gym-owner-bookings"
-            title="Reservas de Clases"
-          >
-            Ver Reservas
-          </Link>,
-        ],
-        cliente: [
-          <Link
-            key="my-bookings"
-            className="link dim dark-gray f6 f5-l dib mr3 mr4-l"
-            to="/my-bookings"
-            title="Mis Reservas"
-          >
-            Mis Reservas
-          </Link>,
-        ], // Clients only have baseLinks (profile, my-bookings)
-      };
-
-      return (
-        <>
-          {baseLinks}
-          {roleLinks[userRole] || []}
-          <button
-            onClick={handleLogout}
-            className="link dim dark-gray f6 f5-l dib pointer bg-transparent bn"
-            title="Cerrar Sesión"
-          >
-            Cerrar Sesión
-          </button>
-        </>
-      );
-    } else {
-      // No session, show login link
-      return (
-        <Link
-          className="link dim dark-gray f6 f5-l dib"
-          to="/login"
-          title="Login"
-        >
-          Iniciar Sesión
-        </Link>
-      );
-    }
+    return [...links, ...(roleSpecific[userRole] || [])];
   };
+
+  const navLinks = getRoleLinks();
 
   return (
-    <nav className="db dt-l w-100 border-box pa3 ph5-l shadow-1 bg-white">
-      <Link
-        className="db dtc-l v-mid mid-gray link dim w-100 w-25-l tc tl-l mb2 mb0-l"
-        to="/"
-        title="Home"
+    <nav className="db dt-l w-100 border-box pa3 ph5-l shadow-1 bg-white relative">
+      {/* Header: Logo y Botón Hamburguesa */}
+      {/* Eliminamos dtc-l aquí para que el flex-box funcione en móviles */}
+      <div className="flex justify-between items-center w-100 w-25-l v-mid-l">
+        <Link className="link dim mid-gray flex items-center" to="/" onClick={() => setIsOpen(false)}>
+          <img src="/vite.svg" className="dib w2 h2 br-100" alt="Logo" />
+          <span className="pl2 f5 fw6 dark-gray">AppGymHub</span>
+        </Link>
+
+        {/* Botón Hamburguesa (dn-l = display: none en large screens) */}
+        <div className="dn-l">
+          <button onClick={() => setIsOpen(!isOpen)} className="bg-transparent bn pointer dark-gray focus-outline-none pa2" aria-label="Menu">
+             {/* ... (Iconos SVG) ... */}
+            <svg className="w2 h2 fill-current" viewBox="0 0 24 24">
+              {isOpen ? (
+                <path d="M18.3 5.71a1 1 0 00-1.41 0L12 10.59 7.11 5.7a1 1 0 00-1.41 1.41L10.59 12l-4.89 4.89a1 1 0 001.41 1.41L12 13.41l4.89 4.89a1 1 0 001.41-1.41L13.41 12l4.89-4.89a1 1 0 000-1.42z" />
+              ) : (
+                <path d="M4 5h16a1 1 0 010 2H4a1 1 0 010-2zm0 6h16a1 1 0 010 2H4a1 1 0 010-2zm0 6h16a1 1 0 010 2H4a1 1 0 010-2z" />
+              )}
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Contenedor de Links */}
+      <div 
+        className={`${
+          isOpen 
+          ? "db bg-near-white pa3 mt3 br2 bt b--light-gray shadow-1" 
+          : "dn" 
+        } dtc-l v-mid w-100 w-75-l tr-l mt0-l pa0-l bg-white-l bn-l shadow-none-l`}
       >
-        <img
-          src="/vite.svg"
-          className="dib w2 h2 br-100"
-          alt="AppGymHub Logo"
-        />
-        <span className="pl2 f5 fw6">AppGymHub</span>
-      </Link>
-      <div className="db dtc-l v-mid w-100 w-75-l tc tr-l">
-        {/* Links públicos que siempre se muestran */}
-        <Link
-          className="link dim dark-gray f6 f5-l dib mr3 mr4-l"
-          to="/gyms"
-          title="Gimnasios"
-        >
-          Gimnasios
-        </Link>
-        <Link
-          className="link dim dark-gray f6 f5-l dib mr3 mr4-l"
-          to="/membership"
-          title="Membresías"
-        >
-          Membresías
-        </Link>
-        {renderAuthLinks()} {/* Renderiza los links de autenticación/rol */}
+        {/* Links Públicos */}
+        <Link className="link dim dark-gray f6 f5-l db dib-l mr3-l mb3 mb0-l fw5" to="/gyms" onClick={() => setIsOpen(false)}>Gimnasios</Link>
+        <Link className="link dim dark-gray f6 f5-l db dib-l mr3-l mb3 mb0-l fw5" to="/membership" onClick={() => setIsOpen(false)}>Membresías</Link>
+
+        {isOpen && session && <div className="db dn-l bt b--black-10 mb3"></div>}
+
+        {/* Links de Autenticación y Roles */}
+        {/* Usamos 'loading' y 'profile' para asegurar que los links se muestren SOLO cuando tenemos todos los datos */}
+        {loading ? (
+            <span className="f6 f5-l dib ml3">Cargando...</span>
+        ) : (
+          <>
+            {session ? (
+              <>
+                {navLinks.map((link) => (
+                  <Link key={link.to} className="link dim dark-gray f6 f5-l db dib-l mr3-l mb3 mb0-l fw5" to={link.to} onClick={() => setIsOpen(false)}>{link.label}</Link>
+                ))}
+                <button onClick={handleLogout} className="link dim red f6 f5-l db dib-l pointer bg-transparent bn pa0 tl tr-l fw6">Cerrar Sesión</button>
+              </>
+            ) : (
+              <Link className="link dim blue f6 f5-l db dib-l fw6" to="/login" onClick={() => setIsOpen(false)}>Iniciar Sesión</Link>
+            )}
+          </>
+        )}
       </div>
     </nav>
   );
