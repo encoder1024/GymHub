@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import { useAuth } from '../contexts/AuthContext'; // Para obtener el usuario actual
+import { useAuth } from '../hooks/useAuth'; // Para obtener el usuario actual
 import ClassCard from '../components/ClassCard'; // Importar ClassCard
 
 const GymOwnerDashboardPage = () => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import { useAuth } from '../contexts/AuthContext'; // Necesario para obtener el usuario actual
+import { useAuth } from '../hooks/useAuth'; // Necesario para obtener el usuario actual
 
 const AdminGymApprovalPage = () => {
   const { session } = useAuth();
