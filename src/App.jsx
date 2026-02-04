@@ -11,9 +11,9 @@ import MyBookingsPage from './pages/MyBookingsPage';
 import GymOwnerDashboardPage from './pages/GymOwnerDashboardPage';
 import GymOwnerBookingListPage from './pages/GymOwnerBookingListPage';
 import GymOwnerClassManagementPage from './pages/GymOwnerClassManagementPage'; // Importar la nueva página
-import AdminGymApprovalPage from './pages/AdminGymApprovalPage';
-import AdminUserManagementPage from './pages/AdminUserManagementPage';
-import AdminMetricsDashboardPage from './pages/AdminMetricsDashboardPage';
+import AdminGymApprovalPage from './pages/admin/AdminGymApprovalPage';
+import AdminUserManagementPage from './pages/admin/AdminUserManagementPage';
+import AdminMetricsDashboardPage from './pages/admin/AdminMetricsDashboardPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -37,9 +37,9 @@ function App() {
           <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
 
           {/* Rutas de Administrador */}
-          <Route path="/admin/gym-approval" element={<ProtectedRoute roles={['admin']}><AdminGymApprovalPage /></ProtectedRoute>} />
-          <Route path="/admin/user-management" element={<ProtectedRoute roles={['admin']}><AdminUserManagementPage /></ProtectedRoute>} />
-          <Route path="/admin/metrics" element={<ProtectedRoute roles={['admin']}><AdminMetricsDashboardPage /></ProtectedRoute>} />
+          <Route path="/admin/AdminGymApprovalPage" element={<ProtectedRoute roles={['admin']}><AdminGymApprovalPage /></ProtectedRoute>} />
+          <Route path="/admin/AdminUserManagementPage" element={<ProtectedRoute roles={['admin']}><AdminUserManagementPage /></ProtectedRoute>} />
+          <Route path="/admin/AdminMetricsDashboardPage" element={<ProtectedRoute roles={['admin']}><AdminMetricsDashboardPage /></ProtectedRoute>} />
 
           {/* Rutas de Propietario de Gimnasio (Owner) */}
           <Route path="/gym-owner-dashboard" element={<ProtectedRoute roles={['owner']}><GymOwnerDashboardPage /></ProtectedRoute>} />
