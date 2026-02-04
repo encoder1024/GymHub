@@ -63,6 +63,7 @@ export const AuthProvider = ({ children }) => {
       const { data: { session: curr } } = await supabase.auth.getSession();
       await handleAuth(curr);
     } catch (err) {
+      console.log(err);
       if (mounted) setLoading(false);
     }
   };
