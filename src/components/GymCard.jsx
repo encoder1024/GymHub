@@ -18,7 +18,6 @@ const GymCard = ({ gym, onBook }) => { // Recibe gym y la función onBook
       <div className="w-100 w-40-l pa2">
         <img src="https://placehold.co/600x400/000000/FFFFFF/png?text=Gym" className="db w-100 h-auto br2 br--top-l" alt="Foto de un gimnasio." />
       </div>
-      
       <div className="pa2 ph3-ns pb3-ns flex flex-column justify-between w-100 w-60-l">
         <div>
           <h1 className="f4 f3-ns mv0">{gym.name}</h1>
