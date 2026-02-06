@@ -53,7 +53,10 @@ export const CrudDelete = async (elemId, tabla) => {
   }
 };
 
-export const CrudUpdate = async (elemId, tabla, elemData) => {
+export const CrudUpdate = async (elemId, tabla, elemData, mensaje) => {
+  if (!window.confirm(mensaje))
+    return;
+
   let tieneAtributos = false;
 
   if (
@@ -72,20 +75,21 @@ export const CrudUpdate = async (elemId, tabla, elemData) => {
 
   if (tieneAtributos) {
     try {
-      const { error } = await supabase
+      const { data: updatedElement, error } = await supabase
         .from(tabla)
         .update(elemData)
-        .eq("id", elemId);
+        .eq("id", elemId)
+        .select();
 
       if (error) throw error;
       alert("Elemento actualizado correctamente!");
 
-      const { data: updatedElement, error: fetchError } = await supabase
-        .from(tabla)
-        .select("*")
-        .eq("id", elemId);
+      // const { data: updatedElement, error: fetchError } = await supabase
+      //   .from(tabla)
+      //   .select("*")
+      //   .eq("id", elemId);
 
-      if (fetchError) throw error;
+      // if (fetchError) throw error;
 
       return { error, elemId, tabla, updatedElement };
     } catch (error) {
@@ -114,7 +118,11 @@ export const CrudInsert = async (elemId, tabla, elemData) => {
 
   if (tieneAtributos) {
     try {
-      const { error, dataIns } = await supabase.from(tabla).insert([elemData]).select("id").single();
+      const { error, dataIns } = await supabase
+        .from(tabla)
+        .insert([elemData])
+        .select("id")
+        .single();
 
       if (error) throw error;
       alert("Elemento creado correctamente!");

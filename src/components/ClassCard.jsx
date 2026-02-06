@@ -1,9 +1,17 @@
 import React from 'react';
 
-const ClassCard = ({ classInfo, onBook }) => {
+const ClassCard = ({ classInfo, gymInfo, onBook }) => {
   const startTime = new Date(classInfo.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const endTime = new Date(classInfo.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
+  
+  let resultGymName = "";
+  for (const gym of gymInfo) {
+    if (classInfo.gym_id == gym.id){
+      resultGymName = gym.name;
+    }
+  }
+  
+  
   // Determinar si la clase aún es reservable (ej. no ha pasado, o tiene cupos)
   // Para este ejemplo, asumimos que todas son reservables si la fecha es futura.
   const isReservable = new Date(classInfo.start_time) > new Date(); 
@@ -11,6 +19,7 @@ const ClassCard = ({ classInfo, onBook }) => {
   return (
     <div className="bg-white shadow-1 br3 w-100 w-100-m w-100-l flex flex-column justify-between">
       <h3 className="pa1 f4 mv0">{classInfo.name}</h3>
+      <h4 className="pa1 f4 mv0">{resultGymName}</h4>
       <p className="f6 lh-copy measure mid-gray">{classInfo.description}</p>
       <p className="f6 mt2">
         <strong>Horario:</strong> {startTime} - {endTime}

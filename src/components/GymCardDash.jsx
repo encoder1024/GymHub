@@ -2,7 +2,7 @@ const GymCardDash = ({gymInfo, cantClases}) => { // Recibe gym
 
   // Usar clases proporcionadas si existen, de lo contrario, usar mock
 //   const classesToShow = gym.classes && gym.classes.length > 0 ? gym.classes : mockClasses;
-  // console.log("Elementos recibidos:", gymInfo)
+  console.log("Elementos recibidos:", cantClases)
 
   return (
     <div className="bg-white br3 w-100 w-100-m w-100-l flex flex-column justify-between">
@@ -21,7 +21,7 @@ const GymCardDash = ({gymInfo, cantClases}) => { // Recibe gym
         
         {/* Sección de Clases */}
         <div className="mt4">
-          <h3 className="f5 mv2">Clases Disponibles: {cantClases}</h3>
+          <h3 className="f5 mv2">Clases Disponibles: {cantClases.count}</h3>
           {/* {classesToShow.length > 0 ? (
             classesToShow.length()
           ) : (

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../hooks/useAuth"; // Para obtener el usuario actual
 import ClassCard from "../components/ClassCard"; // Importar ClassCard
-import { CrudDelete } from "../services/supaCrud";
+import { CrudDelete, CrudUpdate } from "../services/supaCrud";
 import GymCardDash from "../components/GymCardDash";
 
 const GymOwnerDashboardPage = () => {
@@ -11,6 +11,7 @@ const GymOwnerDashboardPage = () => {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [gymsClasses, setGymsClasses] = useState([]);
 
   // Fetch gym and its classes associated with the owner's profile
   useEffect(() => {
@@ -61,11 +62,23 @@ const GymOwnerDashboardPage = () => {
         const { data: classesData, error: classesError } = await supabase
           .from("classes")
           .select("*")
-          .eq("gym_id", gymData[0].id)
+          .eq("gym_id", gymData[0].id) //TODO acá tengo que hacer que lea las clases de cada gym. Classes quizás tenga que ser un array también
           .order("start_time", { ascending: true });
 
         if (classesError) throw classesError;
         setClasses(classesData);
+
+        const { data, error } = await supabase.rpc("get_gym_classes_count");
+
+        if (error) {
+          console.error("Error:", error.message);
+        } else {
+          console.log(
+            "Conteos filtrados (solo gyms activos y aprobados):",
+            data,
+          );
+          setGymsClasses(Object.entries(data).map(([id, count]) => ({ id, count })));
+        }
       } catch (error) {
         setError(error.message);
         console.error("Error fetching data:", error);
@@ -137,10 +150,10 @@ const GymOwnerDashboardPage = () => {
     setError(null);
     setLoading(true); // Reutilizar loading para indicar que se está guardando
 
-    const gym2 = gym && gym[0]; //TODO: hay que preguntar en el formulario para que Gym es la clase y hacer dinamico esta asignación de id.
+    // const gym2 = gym && gym[0]; //TODO: hay que preguntar en el formulario para que Gym es la clase y hacer dinamico esta asignación de id.
 
     const classData = {
-      gym_id: gym2[0].id, //TODO: hay que preguntar en el formulario para que Gym es la clase y hacer dinamico esta asignación de id.
+      gym_id: gym[0].id, //TODO: hay que preguntar en el formulario para que Gym es la clase y hacer dinamico esta asignación de id.
       name: className,
       description: classDescription,
       start_time: new Date(startTime).toISOString(),
@@ -170,7 +183,7 @@ const GymOwnerDashboardPage = () => {
       const { data: updatedClasses, error: fetchError } = await supabase
         .from("classes")
         .select("*")
-        .eq("gym_id", gym2[0].id) // TODO: ver cuando tenga varios gym un owner y esto se haga dinámico.
+        .eq("gym_id", gym[0].id) // TODO: ver cuando tenga varios gym un owner y esto se haga dinámico.
         .order("start_time", { ascending: true });
       if (!fetchError) setClasses(updatedClasses);
     } catch (error) {
@@ -228,7 +241,10 @@ const GymOwnerDashboardPage = () => {
       const { data: updatedGyms, error: fetchError } = await supabase
         .from("gyms")
         .select("*")
-        .eq("owner_id", session.user.id);
+        .eq("owner_id", session.user.id)
+        .eq("is_deleted", false)
+        .eq("is_approved", true);
+
       if (!fetchError) setGym(updatedGyms);
     } catch (error) {
       setError(error.message);
@@ -251,13 +267,19 @@ const GymOwnerDashboardPage = () => {
 
   const handleDeleteGym = async (gymId) => {
     try {
-      const { error, elemId } = await CrudDelete(gymId, "gyms");
+      const { error, elemId, updatedElement } = await CrudUpdate(
+        gymId,
+        "gyms",
+        { is_deleted: true },
+        "¿Estás seguro de que quieres borrar este gimnasio?",
+      );
 
       if (error) throw error;
 
-      setClasses(gym.filter((gym) => gym.id !== elemId)); // Actualizar estado local
+      setGym(gym.filter((gym) => gym.id !== elemId)); // Actualizar estado local
+      console.log("El elemento actualizado: ", updatedElement);
     } catch (error) {
-      console.log(`Error al eliminar elemento: ${error.message}`);
+      console.log(`Error al eliminar gimnasio: ${error.message}`);
     }
   };
 
@@ -357,19 +379,19 @@ const GymOwnerDashboardPage = () => {
         {gym && !loading && !error && classes.length === 0 && (
           <p>No hay gimnasio actualmente.</p>
         )}
-        {/* {console.log("Antes de enviar a map:", gym)} */}
+        {console.log("Antes de enviar a map:", gym, gymsClasses)}
         <div className="flex flex-wrap justify-center">
           {Array.isArray(gym) &&
             !loading &&
             !error &&
-            gym.map((gymInter) => (
+            gym.map((gymInter, i) => (
               <div
                 key={gymInter.id}
                 className="bg-white shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc flex flex-column justify-between"
               >
                 <GymCardDash
                   gymInfo={gymInter}
-                  cantClases={classes.length}
+                  cantClases={gymsClasses[i]}
                   // Dummy onBook for now, actual logic will be handled later or if class is booked from gym page
                 />
                 <div className="mt3 flex justify-center gap-2">
@@ -504,6 +526,7 @@ const GymOwnerDashboardPage = () => {
           {!loading && !error && classes.length === 0 && (
             <p>No hay clases programadas.</p>
           )}
+          {console.log("Array de clases antes del map: ", classes)}
           {!loading &&
             !error &&
             classes.map((cls) => (
@@ -513,6 +536,7 @@ const GymOwnerDashboardPage = () => {
               >
                 <ClassCard
                   classInfo={cls}
+                  gymInfo={gym}
                   // Dummy onBook for now, actual logic will be handled later or if class is booked from gym page
                   onBook={() =>
                     alert(
