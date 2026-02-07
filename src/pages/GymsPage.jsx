@@ -4,10 +4,8 @@ import { useNavigate } from "react-router-dom"; // Importar useNavigate
 import { supabase } from "../supabaseClient";
 import GymCard from "../components/GymCard";
 import ClassCard from "../components/ClassCard"; // Importar ClassCard
-
-
-import MapLibreMapComponent from '../components/MapLibreMapComponent';
-
+import { obtenerCoordenadas } from "../services/geoencoderSeervice";
+import MapLibreMapComponent from "../components/MapLibreMapComponent";
 
 const GymsPage = () => {
   const { session } = useAuth();
@@ -69,6 +67,21 @@ const GymsPage = () => {
       setLoading(true);
       setError(null);
 
+      const datosGym = {
+        calle: "Av. Colón",
+        numero: "500",
+        ciudad: "Córdoba",
+        estado: "Córdoba",
+        pais: "Argentina",
+      };
+
+      const coords = await obtenerCoordenadas(datosGym);
+
+      if (coords) {
+        console.log(`Gimnasio ubicado en: ${coords.lat}, ${coords.lon}`);
+        // Aquí harías el insert en Supabase incluyendo coords.lat y coords.lon
+      }
+
       // 1. Obtener ubicación del usuario
       navigator.geolocation.getCurrentPosition(
         async (position) => {
@@ -77,10 +90,14 @@ const GymsPage = () => {
 
           // 2. Llamar a la función RPC de Supabase para obtener gimnasios cercanos
           try {
-            const { data, error } = await supabase.rpc("nearby_gyms", {
+            const { data, error } = await supabase.rpc("buscar_gyms_cercanos", {
               lat: latitude,
               long: longitude,
             });
+
+            console.log("los gym cercanos", data);
+
+            setGyms(data);
 
             if (error) throw error;
             // For demonstration, merge mock classes with fetched gyms if fetched gyms lack classes
@@ -158,7 +175,6 @@ const GymsPage = () => {
     }
   };
 
-
   return (
     <div className="pa4">
       <h1 className="f2">Explora Gimnasios Cercanos</h1>
@@ -166,7 +182,7 @@ const GymsPage = () => {
 
       {loading && <p>Cargando mapa y gimnasios...</p>}
 
-      <MapLibreMapComponent></MapLibreMapComponent>
+      {!loading && <MapLibreMapComponent gymsArray={gyms} />}
 
       <div className="flex flex-wrap">
         {/* Sección del Mapa */}

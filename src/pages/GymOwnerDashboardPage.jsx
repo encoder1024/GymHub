@@ -141,7 +141,9 @@ const GymOwnerDashboardPage = () => {
     setCurrentGym(gym);
     setNameGym(gym.name);
     setDescriptionGym(gym.description || "");
-    setLocationGym(gym.position); // TODO: ver de dar formato en latitud y longitud al valor antes de mostrarlo
+    setLocationGym(gym.position);
+    setLocationGymLat(gym.lng);
+    setLocationGymLng(gym.lat);
     setIsFormOpenGym(true);
   };
 
@@ -221,7 +223,7 @@ const GymOwnerDashboardPage = () => {
     // const lng = -58.3816;
 
     // IMPORTANTE: El orden es Longitud primero, luego Latitud
-    const pointWKT = `POINT(${locationGymLng} ${locationGymLat})`;
+    const pointWKT = `POINT(${locationGymLat} ${locationGymLng})`;
 
     const gymData = {
       owner_id: session.user.id,
@@ -252,12 +254,7 @@ const GymOwnerDashboardPage = () => {
       setIsFormOpenGym(false);
       // Refetch classes after submit
       // console.log(session.user.id)
-      const { data: updatedGyms, error: fetchError } = await supabase
-        .from("gyms")
-        .select("*")
-        .eq("owner_id", session.user.id)
-        .eq("is_deleted", false)
-        .eq("is_approved", true);
+      const { data: updatedGyms, error: fetchError } = await supabase.rpc("get_gyms_with_coords",);
 
       if (!fetchError) setGym(updatedGyms);
     } catch (error) {
@@ -302,16 +299,6 @@ const GymOwnerDashboardPage = () => {
     gymName: "",
   });
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   // Aquí ya tenés los datos listos para enviar a Supabase
-  //   console.log('Datos a enviar:', formData);
-  // };
-
-  // const handleInputChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData({ ...formData, [name]: value });
-  // };
 
   const handleGymChange = (e) => {
     // const selectedId = e.target.value;

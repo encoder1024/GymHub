@@ -1,6 +1,8 @@
 import React from "react";
 
 const ClassCard = ({ classInfo, gymInfo, onBook }) => {
+if (!classInfo || !gymInfo || !onBook){return;}
+
   const startTime = new Date(classInfo.start_time).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
@@ -11,11 +13,12 @@ const ClassCard = ({ classInfo, gymInfo, onBook }) => {
   });
 
   const startDate = new Date(classInfo.start_time).toLocaleDateString("es-AR", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-});
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 
+  
   let resultGymName = "";
   for (const gym of gymInfo) {
     if (classInfo.gym_id == gym.id) {
@@ -43,7 +46,7 @@ const ClassCard = ({ classInfo, gymInfo, onBook }) => {
       </p>
       {isReservable ? (
         <button
-          onClick={() => onBook(classInfo)}
+          onClick={() => onBook(onBook)}
           className="bn ph3 pv2 input-reset ba b--green bg-green grow pointer f6 dib br2 white mt3"
         >
           Reservar
