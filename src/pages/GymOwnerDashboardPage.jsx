@@ -77,7 +77,9 @@ const GymOwnerDashboardPage = () => {
             "Conteos filtrados (solo gyms activos y aprobados):",
             data,
           );
-          setGymsClasses(Object.entries(data).map(([id, count]) => ({ id, count })));
+          setGymsClasses(
+            Object.entries(data).map(([id, count]) => ({ id, count })),
+          );
         }
       } catch (error) {
         setError(error.message);
@@ -151,9 +153,10 @@ const GymOwnerDashboardPage = () => {
     setLoading(true); // Reutilizar loading para indicar que se está guardando
 
     // const gym2 = gym && gym[0]; //TODO: hay que preguntar en el formulario para que Gym es la clase y hacer dinamico esta asignación de id.
+    console.log("El gym elegido al crear la clase:", formData);
 
     const classData = {
-      gym_id: gym[0].id, //TODO: hay que preguntar en el formulario para que Gym es la clase y hacer dinamico esta asignación de id.
+      gym_id: formData.gymId, //TODO: hay que preguntar en el formulario para que Gym es la clase y hacer dinamico esta asignación de id.
       name: className,
       description: classDescription,
       start_time: new Date(startTime).toISOString(),
@@ -183,9 +186,20 @@ const GymOwnerDashboardPage = () => {
       const { data: updatedClasses, error: fetchError } = await supabase
         .from("classes")
         .select("*")
-        .eq("gym_id", gym[0].id) // TODO: ver cuando tenga varios gym un owner y esto se haga dinámico.
+        .eq("gym_id", formData.gymId) // TODO: ver cuando tenga varios gym un owner y esto se haga dinámico.
         .order("start_time", { ascending: true });
       if (!fetchError) setClasses(updatedClasses);
+
+      const { data, error } = await supabase.rpc("get_gym_classes_count");
+
+      if (error) {
+        console.error("Error:", error.message);
+      } else {
+        console.log("Conteos filtrados (solo gyms activos y aprobados):", data);
+        setGymsClasses(
+          Object.entries(data).map(([id, count]) => ({ id, count })),
+        );
+      }
     } catch (error) {
       setError(error.message);
     } finally {
@@ -281,6 +295,58 @@ const GymOwnerDashboardPage = () => {
     } catch (error) {
       console.log(`Error al eliminar gimnasio: ${error.message}`);
     }
+  };
+
+  const [formData, setFormData] = useState({
+    gymId: "",
+    gymName: "",
+  });
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   // Aquí ya tenés los datos listos para enviar a Supabase
+  //   console.log('Datos a enviar:', formData);
+  // };
+
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData({ ...formData, [name]: value });
+  // };
+
+  const handleGymChange = (e) => {
+    // const selectedId = e.target.value;
+    const selectedId = parseInt(e.target.value, 10);
+    console.log("el id del Gym elegido es:", selectedId, gym);
+
+    // 1. Buscamos el objeto completo en nuestro array original usando el ID
+    const gymData = gym.find((gym) => gym.id === selectedId);
+
+    console.log("el nombre del gym elegido es:", gymData);
+
+    // 2. Actualizamos el estado con ambos valores
+    if (gymData) {
+      setFormData({
+        ...formData,
+        gymId: gymData.id,
+        gymName: gymData.name, // Ahora guardamos el nombre también
+      });
+    } else {
+      // Si selecciona la opción vacía, limpiamos los campos
+      setFormData({ ...formData, gymId: "", gymName: "" });
+    }
+  };
+
+  const handleMisClasesGymChange = async (e) => {
+    const selectedId = parseInt(e.target.value, 10);
+    console.log("el id del Gym elegido para mostrar clases:", selectedId, gym);
+
+    const { data: updatedClasses, error: fetchError } = await supabase
+      .from("classes")
+      .select("*")
+      .eq("gym_id", selectedId)
+      .order("start_time", { ascending: true });
+
+    if (!fetchError) setClasses(updatedClasses);
   };
 
   return (
@@ -423,6 +489,20 @@ const GymOwnerDashboardPage = () => {
             + Añadir Clase
           </button>
         </h2>
+        <select
+          name="gymId" // Importante para identificar el campo
+          value={gym.id}
+          onChange={handleMisClasesGymChange}
+          required
+          className="w-full p-2 border border-gray-300 rounded"
+        >
+          {/* <option value="">Seleccioná uno...</option> */}
+          {gym.map((gym) => (
+            <option key={gym.id} value={gym.id}>
+              {gym.name}
+            </option>
+          ))}
+        </select>
 
         {isFormOpen && (
           <div className="measure center pa4 bg-light-gray shadow-1 br2 mb4">
@@ -442,6 +522,25 @@ const GymOwnerDashboardPage = () => {
                   onChange={(e) => setClassName(e.target.value)}
                   required
                 />
+              </div>
+              <div>
+                <label className="db fw6 lh-copy f6" htmlFor="class-name">
+                  Gimnasio
+                </label>
+                <select
+                  name="gymId" // Importante para identificar el campo
+                  value={gym.id}
+                  onChange={handleGymChange}
+                  required
+                  className="w-full p-2 border border-gray-300 rounded"
+                >
+                  <option value="">Seleccioná uno...</option>
+                  {gym.map((gym) => (
+                    <option key={gym.id} value={gym.id}>
+                      {gym.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="mv2">
                 <label
