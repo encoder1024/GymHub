@@ -54,7 +54,7 @@ export const CrudDelete = async (elemId, tabla) => {
 };
 
 export const CrudUpdate = async (elemId, tabla, elemData, mensaje) => {
-  if (!window.confirm(mensaje))
+  if (mensaje && !window.confirm(mensaje))
     return;
 
   let tieneAtributos = false;
@@ -82,7 +82,7 @@ export const CrudUpdate = async (elemId, tabla, elemData, mensaje) => {
         .select();
 
       if (error) throw error;
-      alert("Elemento actualizado correctamente!");
+      // alert("Elemento actualizado correctamente!");
 
       // const { data: updatedElement, error: fetchError } = await supabase
       //   .from(tabla)

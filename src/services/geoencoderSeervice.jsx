@@ -1,33 +1,21 @@
-import NodeGeocoder from 'node-geocoder';
+// src/services/geocodingService.js
+import { supabase } from '../supabaseClient'; // Asegúrate de que esta sea tu instancia configurada
 
-const options = {
-  provider: 'openstreetmap',
-  // Opcional: podés agregar 'fetch' si estás en una versión de Node antigua
-  // formatter: null 
-};
+export const geolocalizarGimnasio = async (datosDireccion) => {
+  const { data, error } = await supabase.functions.invoke('geolocalizar-gym', {
+    body: datosDireccion, // {calle, numero, ciudad, estado, pais}
+    method: 'POST',
+  });
 
-const geocoder = NodeGeocoder(options);
-
-/**
- * Convierte una dirección en coordenadas lat/lon
- * @param {Object} data - { calle, numero, ciudad, estado, pais }
- */
-export const obtenerCoordenadas = async ({ calle, numero, ciudad, estado, pais }) => {
-  const direccionCompleta = `${calle} ${numero}, ${ciudad}, ${estado}, ${pais}`;
-  
-  try {
-    const res = await geocoder.geocode(direccionCompleta);
-    
-    if (res.length > 0) {
-      return {
-        lat: res[0].latitude,
-        lon: res[0].longitude,
-        formateada: res[0].formattedAddress
-      };
-    }
-    throw new Error("No se encontraron coordenadas para esa dirección.");
-  } catch (error) {
-    console.error("Error en Geocoding:", error.message);
+  if (error) {
+    console.error("Error al llamar a la función Edge:", error.message);
     return null;
   }
+
+  if (data && data.error) {
+      console.error("Error de la API:", data.error);
+      return null;
+  }
+  
+  return data; // Devuelve { lat, lon, direccion }
 };

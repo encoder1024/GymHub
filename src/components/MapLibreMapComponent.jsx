@@ -53,8 +53,9 @@ export default function MapTilerComponent({ gymsArray }) {
       // Definimos el HTML del popup con un botón
       const htmlContent = `
         <div style="text-align:center">
-          <h3>${gym.name}</h3>
-          <p>${gym.description}</p>
+          <h3>${gym.title}</h3>
+          <p>${gym.category_name}</p>
+          <p>${gym.phone}</p>
           <button onclick="window.location.href='/gym-owner-bookings?id=${gym.id}'" 
                   style="background:#007bff; color:white; border:none; padding:5px 10px; cursor:pointer;">
             Ver detalles / Reservar
@@ -66,7 +67,7 @@ export default function MapTilerComponent({ gymsArray }) {
       const popup = new maptilersdk.Popup({ offset: 25 }).setHTML(htmlContent);
 
       new maptilersdk.Marker({ color: "#0000FF" }) // Puedes personalizar el color
-        .setLngLat([gym.latitud, gym.longitud])
+        .setLngLat([gym.longitud, gym.latitud ])
         .setPopup(popup) //new maptilersdk.Popup().setHTML(`<h3>${gym.name}</h3>`)
         .addTo(map.current);
     });
@@ -75,7 +76,7 @@ export default function MapTilerComponent({ gymsArray }) {
     // Usamos 'flyTo' para una transición suave al primer gimnasio
     if (gymsArray.length > 0) {
       map.current.flyTo({
-        center: [gymsArray[0].latitud, gymsArray[0].longitud],
+        center: [gymsArray[0].longitud, gymsArray[0].latitud],
         essential: true, // Esto garantiza que vuele incluso si la API es lenta
       });
     }
