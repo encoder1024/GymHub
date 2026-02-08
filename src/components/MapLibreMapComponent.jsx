@@ -9,15 +9,15 @@ export default function MapTilerComponent({ gymsArray }) {
   const [lng] = useState(-64.152456); // Buenos Aires
   const [lat] = useState(-31.426168);
   const API_KEY = import.meta.env.VITE_MAPTILER_APY_KEY;
-  const [userLong, setUserLong] = useState(0);
-  const [userLat, setUserLat] = useState(0);
+  // const [userLong, setUserLong] = useState(0);
+  // const [userLat, setUserLat] = useState(0);
 
   // Definimos nuestros datos de gimnasios (ejemplo)
-  const gyms = [
-    { id: 1, name: "Gimnasio Central", lng: -64.152456, lat: -31.426168 },
-    { id: 2, name: "Gimnasio Norte", lng: -64.142456, lat: -31.416168 },
-    { id: 3, name: "Gimnasio Sur", lng: -64.162456, lat: -31.436168 },
-  ];
+  // const gyms = [
+  //   { id: 1, name: "Gimnasio Central", lng: -64.152456, lat: -31.426168 },
+  //   { id: 2, name: "Gimnasio Norte", lng: -64.142456, lat: -31.416168 },
+  //   { id: 3, name: "Gimnasio Sur", lng: -64.162456, lat: -31.436168 },
+  // ];
 
   useEffect(() => {
     if (map.current) return;
@@ -26,8 +26,8 @@ export default function MapTilerComponent({ gymsArray }) {
       // Éxito: callback que recibe la posición
       (position) => {
         const { latitude, longitude } = position.coords;
-        setUserLat(latitude);
-        setUserLong(longitude);
+        // setUserLat(latitude);
+        // setUserLong(longitude);
         console.log(`Latitud: ${latitude}`);
         console.log(`Longitud: ${longitude}`);
         console.log("Posición completa:", position);
@@ -42,7 +42,7 @@ export default function MapTilerComponent({ gymsArray }) {
 
     map.current = new maptilersdk.Map({
       container: mapContainer.current,
-      style: maptilersdk.MapStyle.STREETS,
+      style: maptilersdk.MapStyle.BASIC_V2, //maptilersdk.MapStyle.STREETS_V4,
       center: [lng, lat],
       zoom: zoom,
     });
@@ -76,7 +76,7 @@ export default function MapTilerComponent({ gymsArray }) {
     // Usamos 'flyTo' para una transición suave al primer gimnasio
     if (gymsArray.length > 0) {
       map.current.flyTo({
-        center: [gymsArray[0].longitud, gymsArray[0].latitud],
+        center: [-60.6638467, -32.9530517],
         essential: true, // Esto garantiza que vuele incluso si la API es lenta
       });
     }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { supabase } from "../supabaseClient";
-import { useAuth } from "../hooks/useAuth";
+import { supabase } from "../../supabaseClient";
+import { useAuth } from "../../hooks/useAuth";
 
 const MyBookingsPage = () => {
   const { session } = useAuth();
@@ -89,6 +89,25 @@ const MyBookingsPage = () => {
     );
   }
 
+  const openFormForNewReserva = () => {
+  setIsFormOpen(true);
+  //TODO: tengo que cargar las clases de todos los gimnacios
+  // y mostrar Gym: Clase titulo y cargarlo en el ListView
+  //TODO: Cuando seleccione una clase, tengo que mostrar los datos
+  // de esa clase en el mismo formulario fecha y horario.
+  //TODO: Que si elije otra clase, se vuelva a actualizar los datos.
+  //TODO: el listView tendrá la opción de venir desde el mapa de gyms 
+  // con un gymMap.id para filtrar la lista o mostrar todas las 
+  // clases de todos los gym
+  // también tendrá un boton que borrará ese filtro que viene del mapa
+   
+
+};
+
+const handleReservaSubmit = async (e) => {
+  e.preventDefault();
+};
+
   return (
     <div className="pa4 tc">
       <h1 className="f2 tc mb4">Mis Reservas</h1>
@@ -147,24 +166,6 @@ const MyBookingsPage = () => {
       )}
     </div>
   );
-};
-
-const openFormForNewReserva = () => {
-  //TODO: tengo que cargar las clases de todos los gimnacios
-  // y mostrar Gym: Clase titulo y cargarlo en el ListView
-  //TODO: Cuando seleccione una clase, tengo que mostrar los datos
-  // de esa clase en el mismo formulario fecha y horario.
-  //TODO: Que si elije otra clase, se vuelva a actualizar los datos.
-  //TODO: el listView tendrá la opción de venir desde el mapa de gyms 
-  // con un gymMap.id para filtrar la lista o mostrar todas las 
-  // clases de todos los gym
-  // también tendrá un boton que borrará ese filtro que viene del mapa
-   
-
-};
-
-const handleReservaSubmit = async (e) => {
-  e.preventDefault();
 };
 
 export default MyBookingsPage;
