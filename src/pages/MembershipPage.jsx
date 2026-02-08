@@ -8,9 +8,9 @@ const MembershipPage = () => {
   const { session } = useAuth();
   // Datos de ejemplo para los planes de membresía (idealmente, estos vendrían de la DB)
   const membershipPlans = [
-    { id: 1, name: 'Diario', price: 5.00, duration_days: 1, description: 'Acceso ilimitado por un día.' },
-    { id: 2, name: 'Mensual', price: 40.00, duration_days: 30, description: 'Membresía válida por 30 días.' },
-    { id: 3, name: 'Anual', price: 400.00, duration_days: 365, description: 'Ahorra al elegir nuestra membresía anual.' },
+    { id: 1, name: 'Mensual', price: 50000, duration_days: 1, description: 'Acceso ilimitado por 30 días.' },
+    { id: 2, name: 'Trimestral', price: 140000, duration_days: 90, description: 'Membresía válida por 90 días.' },
+    { id: 3, name: 'Anual', price: 540000, duration_days: 365, description: 'Ahorra al elegir nuestra membresía anual.' },
   ];
 
   const handleSelectPlan = (plan) => {
@@ -30,7 +30,7 @@ const MembershipPage = () => {
         {membershipPlans.map(plan => (
           <div key={plan.id} className="bg-white shadow-1 br3 pa4 ma3 measure w-100 w-40-m w-30-l tc flex flex-column justify-between">
             <h2 className="f3 mb2">{plan.name}</h2>
-            <p className="f1 mv3">${plan.price.toFixed(2)}</p>
+            <p className="f1 mv3">${plan.price.toFixed(0)}</p>
             <p className="f5 lh-copy mb4">{plan.description}</p>
             <button
               onClick={() => handleSelectPlan(plan)}
