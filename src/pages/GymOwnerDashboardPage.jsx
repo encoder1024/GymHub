@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../hooks/useAuth"; // Para obtener el usuario actual
 import ClassCard from "../components/ClassCard"; // Importar ClassCard
 import { CrudDelete, CrudUpdate } from "../services/supaCrud";
 import GymCardDash from "../components/GymCardDash";
+import { animateScroll as scroll } from "react-scroll"; // Alias para mayor comodidad
 
 const GymOwnerDashboardPage = () => {
   const { session } = useAuth();
@@ -12,6 +13,72 @@ const GymOwnerDashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [gymsClasses, setGymsClasses] = useState([]);
+
+  // --- Formulario para añadir/editar clases ---
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [currentClass, setCurrentClass] = useState(null); // Para editar una clase existente
+  const [className, setClassName] = useState("");
+  const [classDescription, setClassDescription] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [capacity, setCapacity] = useState("");
+  const [gymSeleccionadoClassEdit, setGymSeleccionadoClassEdit] = useState(0);
+
+  const [isFormOpenGym, setIsFormOpenGym] = useState(false);
+  const [currentGym, setCurrentGym] = useState(null); // Para editar una clase existente
+  const [nameGym, setNameGym] = useState("");
+  const [descriptionGym, setDescriptionGym] = useState("");
+  const [locationGymLat, setLocationGymLat] = useState("");
+  const [locationGymLng, setLocationGymLng] = useState("");
+  const [locationGym, setLocationGym] = useState("");
+
+  // Creamos la referencia
+  const miReferencia = useRef(null); // al formulario de gym para hacer el scroll suave
+  const miReferenciaClass = useRef(null); // alformulario de clases para hacer el scroll suave
+
+  // Este useEffect se dispara cuando 'isFormOpenGym' cambia a true
+  useEffect(() => {
+    if (isFormOpenGym && miReferencia.current) {
+      // 1. Calculamos la posición absoluta del elemento en la página
+      const elemento = miReferencia.current;
+      const posicionY =
+        elemento.getBoundingClientRect().top + window.pageYOffset;
+
+      // 2. Ejecutamos el scroll con opciones personalizadas
+      scroll.scrollTo(posicionY - 100, {
+        // -100 es el offset para no pegar al techo
+        duration: 1500, // Duración en ms (2 segundos lo hace muy suave)
+        delay: 0, // Espera antes de empezar
+        smooth: "easeInOutQuint", // Curva de aceleración/frenado elegante
+      });
+
+      // Opcional: poner el foco en el primer input
+      const primerInput = miReferencia.current.querySelector("input");
+      if (primerInput) primerInput.focus();
+    }
+  }, [isFormOpenGym]);
+
+  // Este useEffect se dispara cuando 'isFormOpenGym' cambia a true
+  useEffect(() => {
+    if (isFormOpen && miReferenciaClass.current) {
+      // 1. Calculamos la posición absoluta del elemento en la página
+      const elemento = miReferenciaClass.current;
+      const posicionY =
+        elemento.getBoundingClientRect().top + window.pageYOffset;
+
+      // 2. Ejecutamos el scroll con opciones personalizadas
+      scroll.scrollTo(posicionY - 100, {
+        // -100 es el offset para no pegar al techo
+        duration: 1500, // Duración en ms (2 segundos lo hace muy suave)
+        delay: 0, // Espera antes de empezar
+        smooth: "easeInOutQuint", // Curva de aceleración/frenado elegante
+      });
+
+      // Opcional: poner el foco en el primer input
+      const primerInput = miReferenciaClass.current.querySelector("input");
+      if (primerInput) primerInput.focus();
+    }
+  }, [isFormOpen]);
 
   // Fetch gym and its classes associated with the owner's profile
   useEffect(() => {
@@ -62,7 +129,7 @@ const GymOwnerDashboardPage = () => {
         const { data: classesData, error: classesError } = await supabase
           .from("classes")
           .select("*")
-          .eq("gym_id", gymData[0].id) //TODO acá tengo que hacer que lea las clases de cada gym. Classes quizás tenga que ser un array también
+          .eq("gym_id", gymData[0].id)
           .order("start_time", { ascending: true });
 
         if (classesError) throw classesError;
@@ -92,23 +159,6 @@ const GymOwnerDashboardPage = () => {
     fetchData();
   }, [session]);
 
-  // --- Formulario para añadir/editar clases ---
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [currentClass, setCurrentClass] = useState(null); // Para editar una clase existente
-  const [className, setClassName] = useState("");
-  const [classDescription, setClassDescription] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [capacity, setCapacity] = useState("");
-
-  const [isFormOpenGym, setIsFormOpenGym] = useState(false);
-  const [currentGym, setCurrentGym] = useState(null); // Para editar una clase existente
-  const [nameGym, setNameGym] = useState("");
-  const [descriptionGym, setDescriptionGym] = useState("");
-  const [locationGymLat, setLocationGymLat] = useState("");
-  const [locationGymLng, setLocationGymLng] = useState("");
-  const [locationGym, setLocationGym] = useState("");
-
   const openFormForNewClass = () => {
     setCurrentClass(null);
     setClassName("");
@@ -122,6 +172,7 @@ const GymOwnerDashboardPage = () => {
   const openFormForEdit = (cls) => {
     setCurrentClass(cls);
     setClassName(cls.name);
+    setGymSeleccionadoClassEdit(cls.gym_id);
     setClassDescription(cls.description || "");
     setStartTime(new Date(cls.start_time).toISOString().slice(0, 16)); // Formato YYYY-MM-DDTHH:MM
     setEndTime(new Date(cls.end_time).toISOString().slice(0, 16));
@@ -154,11 +205,10 @@ const GymOwnerDashboardPage = () => {
     setError(null);
     setLoading(true); // Reutilizar loading para indicar que se está guardando
 
-    // const gym2 = gym && gym[0]; //TODO: hay que preguntar en el formulario para que Gym es la clase y hacer dinamico esta asignación de id.
     console.log("El gym elegido al crear la clase:", formData);
 
     const classData = {
-      gym_id: formData.gymId, //TODO: hay que preguntar en el formulario para que Gym es la clase y hacer dinamico esta asignación de id.
+      gym_id: formData.gymId,
       name: className,
       description: classDescription,
       start_time: new Date(startTime).toISOString(),
@@ -254,7 +304,9 @@ const GymOwnerDashboardPage = () => {
       setIsFormOpenGym(false);
       // Refetch classes after submit
       // console.log(session.user.id)
-      const { data: updatedGyms, error: fetchError } = await supabase.rpc("get_gyms_with_coords",);
+      const { data: updatedGyms, error: fetchError } = await supabase.rpc(
+        "get_gyms_with_coords",
+      );
 
       if (!fetchError) setGym(updatedGyms);
     } catch (error) {
@@ -299,12 +351,11 @@ const GymOwnerDashboardPage = () => {
     gymName: "",
   });
 
-
   const handleGymChange = (e) => {
     // const selectedId = e.target.value;
     const selectedId = parseInt(e.target.value, 10);
     console.log("el id del Gym elegido es:", selectedId, gym);
-
+    setGymSeleccionadoClassEdit(e.target.value); //NOW
     // 1. Buscamos el objeto completo en nuestro array original usando el ID
     const gymData = gym.find((gym) => gym.id === selectedId);
 
@@ -354,7 +405,7 @@ const GymOwnerDashboardPage = () => {
             <h3 className="f4 mb3">
               {currentGym ? "Editar Gym" : "Nuevo Gym"}
             </h3>
-            <form onSubmit={handleGymSubmit}>
+            <form onSubmit={handleGymSubmit} ref={miReferencia}>
               <div className="mv2">
                 <label className="db fw6 lh-copy f6" htmlFor="class-name">
                   Nombre
@@ -445,7 +496,7 @@ const GymOwnerDashboardPage = () => {
                 <GymCardDash
                   gymInfo={gymInter}
                   cantClases={gymsClasses[i]}
-                  // Dummy onBook for now, actual logic will be handled later or if class is booked from gym page
+                  // Dummy onBook for ahora, actual logic will be handled later or if class is booked from gym page
                 />
                 <div className="mt3 flex justify-center gap-2">
                   <button
@@ -496,7 +547,7 @@ const GymOwnerDashboardPage = () => {
             <h3 className="f4 mb3">
               {currentClass ? "Editar Clase" : "Nueva Clase"}
             </h3>
-            <form onSubmit={handleClassSubmit}>
+            <form onSubmit={handleClassSubmit} ref={miReferenciaClass}>
               <div className="mv2">
                 <label className="db fw6 lh-copy f6" htmlFor="class-name">
                   Nombre
@@ -516,7 +567,7 @@ const GymOwnerDashboardPage = () => {
                 </label>
                 <select
                   name="gymId" // Importante para identificar el campo
-                  value={gym.id}
+                  value={gymSeleccionadoClassEdit} //NOW
                   onChange={handleGymChange}
                   required
                   className="w-full p-2 border border-gray-300 rounded"
@@ -528,6 +579,17 @@ const GymOwnerDashboardPage = () => {
                     </option>
                   ))}
                 </select>
+
+                {/* <select
+                  value={seleccionado}
+                  onChange={(e) => setSeleccionado(e.target.value)}
+                >
+                  {opciones.map((opcion) => (
+                    <option key={opcion} value={opcion}>
+                      {opcion}
+                    </option>
+                  ))}
+                </select> */}
               </div>
               <div className="mv2">
                 <label
@@ -623,7 +685,7 @@ const GymOwnerDashboardPage = () => {
                 <ClassCard
                   classInfo={cls}
                   gymInfo={gym}
-                  // Dummy onBook for now, actual logic will be handled later or if class is booked from gym page
+                  // Dummy onBook for ahora, actual logic will be handled later or if class is booked from gym page
                   onBook={() =>
                     alert(
                       "Reserva simulada. Iría a una página de confirmación o lógica de pago.",
