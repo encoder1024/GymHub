@@ -1,6 +1,9 @@
 import React from "react";
 
-const ClassCard = ({ classInfo, gymInfo, onBook }) => {
+const ClassCard = ({ classInfo, gymInfo, onBook, tabla }) => {
+
+  console.log("lo que recibe ClassCard:", classInfo, gymInfo, onBook)
+
 if (!classInfo || !gymInfo || !onBook){return;}
 
   const startTime = new Date(classInfo.start_time).toLocaleTimeString([], {
@@ -22,7 +25,7 @@ if (!classInfo || !gymInfo || !onBook){return;}
   let resultGymName = "";
   for (const gym of gymInfo) {
     if (classInfo.gym_id == gym.id) {
-      resultGymName = gym.name;
+      tabla == "SantaFe" ? resultGymName = gym.title : resultGymName = gym.name;
     }
   }
 

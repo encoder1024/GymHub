@@ -1,19 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../../supabaseClient";
 import { useAuth } from "../../hooks/useAuth";
+import GymAutocomplete from "../../components/GymAutocomplete";
+import ClassCard from "../../components/ClassCard";
 
 const MyBookingsPage = () => {
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [gymSeleccionado, setGymSeleccionado] = useState(null);
+  const [isReservasOpen, setIsReservasOpen] = useState(false);
+  const [isSelectedGym, setIsSelectedGym] = useState(false);
+  const [classes, setClasses] = useState([]);
+  const [gymActual, setGymActual] = useState([]);
 
   useEffect(() => {
     const fetchBookings = async () => {
       if (!session?.user) {
         setLoading(false);
         return; // No hay sesión, no hay reservas que mostrar
+      }
+
+      if (!profile || profile.role !== "cliente") {
+        setError("No tienes permisos para acceder a esta página.");
+        setLoading(false);
+        return;
       }
 
       setLoading(true);
@@ -90,78 +103,158 @@ const MyBookingsPage = () => {
   }
 
   const openFormForNewReserva = () => {
-  setIsFormOpen(true);
-  //TODO: tengo que cargar las clases de todos los gimnacios
-  // y mostrar Gym: Clase titulo y cargarlo en el ListView
-  //TODO: Cuando seleccione una clase, tengo que mostrar los datos
-  // de esa clase en el mismo formulario fecha y horario.
-  //TODO: Que si elije otra clase, se vuelva a actualizar los datos.
-  //TODO: el listView tendrá la opción de venir desde el mapa de gyms 
-  // con un gymMap.id para filtrar la lista o mostrar todas las 
-  // clases de todos los gym
-  // también tendrá un boton que borrará ese filtro que viene del mapa
-   
+    setIsFormOpen(true);
+    setIsReservasOpen(false);
+    setIsSelectedGym(false);
+    //TODO: tengo que cargar las clases de todos los gimnacios
+    // y mostrar Gym: Clase titulo y cargarlo en el ListView
+    //TODO: Cuando seleccione una clase, tengo que mostrar los datos
+    // de esa clase en el mismo formulario fecha y horario.
+    //TODO: Que si elije otra clase, se vuelva a actualizar los datos.
+    //TODO: el listView tendrá la opción de venir desde el mapa de gyms
+    // con un gymMap.id para filtrar la lista o mostrar todas las
+    // clases de todos los gym
+    // también tendrá un boton que borrará ese filtro que viene del mapa
+  };
 
-};
+  // Esta es la función que pasaremos como parámetro
+  const manejarSeleccion = async (opcion) => {
+    if (opcion) {
+      console.log("ID del Gym elegido:", opcion.value);
+      console.log("Nombre del Gym elegido:", opcion.label);
 
-const handleReservaSubmit = async (e) => {
-  e.preventDefault();
-};
+      // Guardamos la elección en el estado del padre
+      setGymSeleccionado(opcion);
+      setIsSelectedGym(true);
+      setLoading(true);
+      try {
+        const { data: gymData, error: gymError } = await supabase
+          .from("gymsSantaFe")
+          .select("*")
+          .eq("id", opcion.value);
+
+        if (gymError) throw gymError;
+
+        setGymActual(gymData);
+
+        const { data: classesData, error: classesError } = await supabase
+          .from("classes_santa_fe")
+          .select("*")
+          .eq("gym_id", opcion.value)
+          .order("start_time", { ascending: true });
+
+        if (classesError) throw classesError;
+
+        console.log("estas son las clases:", classesData);
+        setClasses(classesData);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoading(false);
+      }
+      // 3. Fetch classes for this gym
+    }
+  };
+
+  const openMostrarReservas = () => {
+    setIsReservasOpen(true);
+    setIsFormOpen(false);
+    setIsSelectedGym(false);
+    //TODO: tengo que cargar las clases de todos los gimnacios
+    // y mostrar Gym: Clase titulo y cargarlo en el ListView
+    //TODO: Cuando seleccione una clase, tengo que mostrar los datos
+    // de esa clase en el mismo formulario fecha y horario.
+    //TODO: Que si elije otra clase, se vuelva a actualizar los datos.
+    //TODO: el listView tendrá la opción de venir desde el mapa de gyms
+    // con un gymMap.id para filtrar la lista o mostrar todas las
+    // clases de todos los gym
+    // también tendrá un boton que borrará ese filtro que viene del mapa
+  };
 
   return (
     <div className="pa4 tc">
       <h1 className="f2 tc mb4">Mis Reservas</h1>
       <button
         onClick={openFormForNewReserva}
-        className="bn ph3 pv2 bg-blue white grow pointer f6 dib br2"
+        className="bn ph3 pv2 bg-blue white grow pointer f6 dib br2 ma2"
       >
         + Añadir Reserva
       </button>
+      <button
+        onClick={openMostrarReservas}
+        className="bn ph3 pv2 bg-green white grow pointer f6 dib br2 ma2"
+      >
+        Mostrar mis Reservas
+      </button>
+      {isReservasOpen && (
+        <div className="pa4 tc">
+          {bookings.length === 0 ? (
+            <p className="tc">Aún no tienes ninguna reserva.</p>
+          ) : (
+            <div className="flex flex-wrap justify-center">
+              {bookings.map((booking) => (
+                <div
+                  key={booking.id}
+                  className="bg-white shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc"
+                >
+                  <h3 className="f4 mv0">{booking.classes.name}</h3>
+                  <p className="f6 lh-copy measure mid-gray">
+                    En: {booking.classes.gyms.name}
+                  </p>
+                  <p className="f6 mt2">
+                    <strong>Horario:</strong>{" "}
+                    {new Date(booking.classes.start_time).toLocaleString()} -{" "}
+                    {new Date(booking.classes.end_time).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  <p className="f6">
+                    <strong>Estado:</strong> {booking.status}
+                  </p>
+                  <button
+                    onClick={() => handleCancelBooking(booking.id)}
+                    className="bn ph3 pv2 input-reset ba b--red bg-red grow pointer f6 dib br2 white mt3"
+                  >
+                    Cancelar Reserva
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       {isFormOpen && (
         <div className="measure center pa4 bg-light-gray shadow-1 br2 mb4">
           <h3 className="f4 mb3">Nueva Reserva</h3>
-          <form onSubmit={handleReservaSubmit}>
-            <div className="mv2">
-              <label className="db fw6 lh-copy f6" htmlFor="class-name">
-                Nombre
-              </label>
-            </div>
-          </form>
+          <GymAutocomplete onSelectGym={manejarSeleccion} />
+          {/* Sección de Clases */}
         </div>
       )}
-
-      {bookings.length === 0 ? (
-        <p className="tc">Aún no tienes ninguna reserva.</p>
-      ) : (
-        <div className="flex flex-wrap justify-center">
-          {bookings.map((booking) => (
-            <div
-              key={booking.id}
-              className="bg-white shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc"
-            >
-              <h3 className="f4 mv0">{booking.classes.name}</h3>
-              <p className="f6 lh-copy measure mid-gray">
-                En: {booking.classes.gyms.name}
-              </p>
-              <p className="f6 mt2">
-                <strong>Horario:</strong>{" "}
-                {new Date(booking.classes.start_time).toLocaleString()} -{" "}
-                {new Date(booking.classes.end_time).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-              <p className="f6">
-                <strong>Estado:</strong> {booking.status}
-              </p>
-              <button
-                onClick={() => handleCancelBooking(booking.id)}
-                className="bn ph3 pv2 input-reset ba b--red bg-red grow pointer f6 dib br2 white mt3"
-              >
-                Cancelar Reserva
-              </button>
+      {isFormOpen && isSelectedGym && !loading && (
+        <div className="mt4">
+          <h3 className="f5 mv2">Clases Disponibles:</h3>
+          {classes.length > 0 ? (
+            <div className="flex flex-wrap justify-start">
+              {classes.map((cls) => (
+                <ClassCard
+                  key={cls.id}
+                  classInfo={cls}
+                  gymInfo={gymActual}
+                  onBook={() =>
+                    alert(
+                      "Esta función es solo por ahora. Ls reservas se hacan acá.",
+                    )
+                  }
+                  tabla="SantaFe" // Pasa la función onBook a ClassCard
+                />
+              ))}
             </div>
-          ))}
+          ) : (
+            <p className="f6 mid-gray">
+              Este gimnasio no tiene clases programadas actualmente.
+            </p>
+          )}
         </div>
       )}
     </div>
