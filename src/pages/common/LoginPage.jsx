@@ -26,7 +26,6 @@ const LoginPage = () => {
 
       // console.log("Login successful, navigating to /profile");
       navigate("/profile"); // Redirige al perfil si el login es exitoso
-
     } catch (err) {
       console.error("Login error:", err.message);
       setError(err.message);
