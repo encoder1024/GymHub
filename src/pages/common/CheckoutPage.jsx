@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
-import { useAuth } from '../hooks/useAuth';
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { supabase } from "../../supabaseClient";
+import { useAuth } from "../../hooks/useAuth";
 
 const CheckoutPage = () => {
   const { session } = useAuth();
@@ -18,9 +18,11 @@ const CheckoutPage = () => {
     } else {
       // Si no se recibe un plan, redirigir a la página de membresías
       // O mostrar un error indicando que debe seleccionar un plan primero
-      setError("Por favor, selecciona un plan de membresía desde la página de planes.");
+      setError(
+        "Por favor, selecciona un plan de membresía desde la página de planes.",
+      );
       // Podríamos redirigir después de un tiempo o al usuario hacer clic en un botón
-      // navigate('/membership'); 
+      // navigate('/membership');
     }
   }, [location, navigate]); // Dependencias
 
@@ -43,7 +45,7 @@ const CheckoutPage = () => {
     // 2. Crear una orden temporal en nuestra DB (opcional, para seguimiento).
     // 3. Crear una preferencia de pago en Mercadopago usando su SDK.
     // 4. Retornar el checkout URL de Mercadopago.
-    
+
     const userId = session.user.id;
     const planId = selectedPlan.id;
     const price = selectedPlan.price;
@@ -52,12 +54,15 @@ const CheckoutPage = () => {
     try {
       // Asumiendo que la función RPC se llama 'create_mercadopago_preference'
       // y espera los parámetros p_user_id, p_plan_id, p_price, p_plan_name
-      const { data, error: rpcError } = await supabase.rpc('create_mercadopago_preference', {
-        p_user_id: userId,
-        p_plan_id: planId,
-        p_price: price,
-        p_plan_name: planName
-      });
+      const { data, error: rpcError } = await supabase.rpc(
+        "create_mercadopago_preference",
+        {
+          p_user_id: userId,
+          p_plan_id: planId,
+          p_price: price,
+          p_plan_name: planName,
+        },
+      );
 
       if (rpcError) throw rpcError;
 
@@ -65,11 +70,12 @@ const CheckoutPage = () => {
       const checkoutUrl = data?.checkout_url; // Acceder de forma segura si data es null
       if (checkoutUrl) {
         // Redirige al usuario a la página de pago de Mercadopago
-        window.location.href = checkoutUrl; 
+        window.location.href = checkoutUrl;
       } else {
-        throw new Error("No se pudo obtener la URL de pago de Mercadopago. Por favor, intenta de nuevo más tarde.");
+        throw new Error(
+          "No se pudo obtener la URL de pago de Mercadopago. Por favor, intenta de nuevo más tarde.",
+        );
       }
-
     } catch (error) {
       console.error("Error during checkout:", error);
       setError(`Error al iniciar el pago: ${error.message}`);
@@ -84,7 +90,6 @@ const CheckoutPage = () => {
       <h1 className="f2 tc mb4">Resumen de tu Pedido</h1>
       <div className="measure center pa4 bg-white shadow-1 br2">
         {error && <p className="f6 red tc mb3">{error}</p>}
-        
         {!error && selectedPlan && session?.user ? (
           <>
             <h2 className="f3 tc mb2">{selectedPlan.name}</h2>
@@ -92,24 +97,33 @@ const CheckoutPage = () => {
             <p className="f5 lh-copy tc mb4">{selectedPlan.description}</p>
             <div className="tc">
               <p className="mb3 f6 gray">
-                Procesando para el usuario: <strong>{session.user.email}</strong>
+                Procesando para el usuario:{" "}
+                <strong>{session.user.email}</strong>
               </p>
               <button
                 onClick={handleCheckout}
                 disabled={loading || !selectedPlan || !session?.user}
                 className="bn ph4 pv2 input-reset ba b--green bg-green grow pointer f6 dib br2 white b"
               >
-                {loading ? 'Procesando...' : 'Ir a Pagar con Mercadopago'}
+                {loading ? "Procesando..." : "Ir a Pagar con Mercadopago"}
               </button>
             </div>
           </>
         ) : !error && !session?.user ? (
           <p className="tc f6 red">
-            Debes <Link to="/login" className="link dim blue db">iniciar sesión</Link> para continuar.
+            Debes{" "}
+            <Link to="/login" className="link dim blue db">
+              iniciar sesión
+            </Link>{" "}
+            para continuar.
           </p>
         ) : !error && !selectedPlan ? (
-          <p className="tc">No se ha seleccionado un plan. Por favor, regresa a la página de membresías para elegir uno.</p>
-        ) : null} {/* null si no hay error, ni plan, ni sesión */}
+          <p className="tc">
+            No se ha seleccionado un plan. Por favor, regresa a la página de
+            membresías para elegir uno.
+          </p>
+        ) : null}{" "}
+        {/* null si no hay error, ni plan, ni sesión */}
       </div>
     </div>
   );

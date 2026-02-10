@@ -1,39 +1,40 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { supabase } from "../../supabaseClient";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
   const handleLogin = async (e) => {
-    
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
-      console.log('Attempting login with:', { email, password });
+      console.log("Attempting login with:", { email, password });
 
-      const { data, error: apiError } = await supabase.auth.signInWithPassword({ email, password });
-      
+      const { data, error: apiError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
       if (apiError) {
         throw apiError;
       }
 
-      console.log('Login successful, navigating to /profile');
-      navigate('/profile'); // Redirige al perfil si el login es exitoso
-      console.log('Supabase signInWithPassword result:', { data, apiError });
-
+      console.log("Login successful, navigating to /profile");
+      navigate("/profile"); // Redirige al perfil si el login es exitoso
+      console.log("Supabase signInWithPassword result:", { data, apiError });
     } catch (err) {
-      console.error('Login error:', err.message);
+      console.error("Login error:", err.message);
       setError(err.message);
     } finally {
       setLoading(false);
-      console.log('Login process finished, loading set to false.');
+      console.log("Login process finished, loading set to false.");
     }
   };
 
@@ -44,7 +45,9 @@ const LoginPage = () => {
           <fieldset id="sign_up" className="ba b--transparent ph0 mh0">
             <legend className="f2 fw6 ph0 mh0">Iniciar Sesión</legend>
             <div className="mt3">
-              <label className="db fw6 lh-copy f6" htmlFor="email-address">Email</label>
+              <label className="db fw6 lh-copy f6" htmlFor="email-address">
+                Email
+              </label>
               <input
                 className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
                 type="email"
@@ -56,7 +59,9 @@ const LoginPage = () => {
               />
             </div>
             <div className="mv3">
-              <label className="db fw6 lh-copy f6" htmlFor="password">Contraseña</label>
+              <label className="db fw6 lh-copy f6" htmlFor="password">
+                Contraseña
+              </label>
               <input
                 className="b pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
                 type="password"
@@ -73,12 +78,14 @@ const LoginPage = () => {
             <input
               className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
               type="submit"
-              value={loading ? 'Ingresando...' : 'Ingresar'}
+              value={loading ? "Ingresando..." : "Ingresar"}
               disabled={loading}
             />
           </div>
           <div className="lh-copy mt3">
-            <Link to="/register" className="f6 link dim black db">¿No tienes cuenta? Regístrate</Link>
+            <Link to="/register" className="f6 link dim black db">
+              ¿No tienes cuenta? Regístrate
+            </Link>
           </div>
         </form>
       </main>

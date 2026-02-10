@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import { supabase } from '../supabaseClient';
+import { useAuth } from '../../hooks/useAuth';
+import { supabase } from '../../supabaseClient';
 
 const AdminMetricsDashboardPage = () => {
   const { session } = useAuth();
