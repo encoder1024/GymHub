@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { supabase } from "../../supabaseClient";
+import OneSignal from "react-onesignal";
 
 const ProfilePage = () => {
   const { session } = useAuth();
@@ -11,6 +12,25 @@ const ProfilePage = () => {
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState(""); // El rol debe ser visible pero no editable por el usuario común
   const [phone, setPhone] = useState("");
+
+    useEffect(() => {
+    const init = async () => {
+      await OneSignal.init({
+        appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
+        allowLocalhostAsSecureOrigin: true,
+      });
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        await OneSignal.login(user.id);
+        console.log("OneSignal login:", user.id);
+      }
+    };
+
+    init();
+  }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -170,6 +190,7 @@ const ProfilePage = () => {
             {isUpdating ? "Guardando..." : "Guardar Cambios"}
           </button>
         </form>
+        <p style={{color: "#bbb"}}>v:1.0.0</p>
       </div>
     </div>
   );
