@@ -16,6 +16,7 @@ import AdminUserManagementPage from "./pages/admin/AdminUserManagementPage";
 import AdminMetricsDashboardPage from "./pages/admin/AdminMetricsDashboardPage";
 import NotFoundPage from "./pages/common/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import BookCheckoutPage from "./pages/user/BookCheckoutPage";
 
 function App() {
   return (
@@ -53,6 +54,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <CheckoutPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/book-checkout"
+            element={
+              <ProtectedRoute>
+                <BookCheckoutPage />
               </ProtectedRoute>
             }
           />

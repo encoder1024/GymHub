@@ -43,7 +43,7 @@ const Navbar = () => {
   const navLinks = getRoleLinks();
 
   return (
-    <nav className="db dt-l w-100 border-box pa3 ph5-l shadow-1 bg-white relative">
+    <nav className="db dt-l w-100 border-box pa1 ph5-l shadow-1 bg-white relative">
       {/* Header: Logo y Botón Hamburguesa */}
       {/* Eliminamos dtc-l aquí para que el flex-box funcione en móviles */}
       <div className="flex justify-between items-center w-100 w-25-l v-mid-l">

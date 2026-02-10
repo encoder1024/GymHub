@@ -90,7 +90,7 @@ const GymsPage = () => {
 
             console.log("cantidad de gyms con coordenadas: ", data.length); // Aquí verás el número real total
 
-            console.log("los gym cercanos", data);
+            console.log("los gym: ", data);
 
             setGyms(data);
 
@@ -172,7 +172,7 @@ const GymsPage = () => {
 
   return (
     <div className="pa4">
-      <h1 className="f2">Explora Gimnasios Cercanos</h1>
+      <h1 className="f3">Explora Gimnasios Cercanos</h1>
       {error && <p className="f6 red">{error}</p>}
 
       {loading && <p>Cargando mapa y gimnasios...</p>}
@@ -184,12 +184,12 @@ const GymsPage = () => {
 
         {/* Sección de Lista de Gimnasios */}
         <div className="w-100 w-40-l pl3-l">
-          <h2 className="f3">Gimnasios Cercanos</h2>
+          {/* <h2 className="f3">Gimnasios Cercanos</h2> */}
           {loading && !error && <p>Cargando gimnasios...</p>}
           {!loading && !error && gyms.length === 0 && (
             <p>No se encontraron gimnasios cerca.</p>
           )}
-          {!loading && !error && gyms.length > 0 && (
+          {false && !loading && !error && gyms.length > 0 && (
             <div className="flex flex-column items-center">
               {gyms.map((gym) => (
                 <div key={gym.id} className="mb3 w-100">

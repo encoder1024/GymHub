@@ -56,7 +56,7 @@ export default function MapTilerComponent({ gymsArray }) {
           <h3>${gym.title}</h3>
           <p>${gym.category_name}</p>
           <p>${gym.phone}</p>
-          <button onclick="window.location.href='/gym-owner-bookings?id=${gym.id}'" 
+          <button onclick="window.location.href='/user/my-bookings?name=${gym.title}&id=${gym.id}'" 
                   style="background:#007bff; color:white; border:none; padding:5px 10px; cursor:pointer;">
             Ver detalles / Reservar
           </button>
