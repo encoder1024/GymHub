@@ -140,10 +140,10 @@ const GymOwnerDashboardPage = () => {
         if (error) {
           console.error("Error:", error.message);
         } else {
-          console.log(
-            "Conteos filtrados (solo gyms activos y aprobados):",
-            data,
-          );
+          // console.log(
+          //   "Conteos filtrados (solo gyms activos y aprobados):",
+          //   data,
+          // );
           setGymsClasses(
             Object.entries(data).map(([id, count]) => ({ id, count })),
           );
@@ -205,7 +205,7 @@ const GymOwnerDashboardPage = () => {
     setError(null);
     setLoading(true); // Reutilizar loading para indicar que se está guardando
 
-    console.log("El gym elegido al crear la clase:", formData);
+    // console.log("El gym elegido al crear la clase:", formData);
 
     const classData = {
       gym_id: formData.gymId,
@@ -247,7 +247,7 @@ const GymOwnerDashboardPage = () => {
       if (error) {
         console.error("Error:", error.message);
       } else {
-        console.log("Conteos filtrados (solo gyms activos y aprobados):", data);
+        // console.log("Conteos filtrados (solo gyms activos y aprobados):", data);
         setGymsClasses(
           Object.entries(data).map(([id, count]) => ({ id, count })),
         );
@@ -340,7 +340,7 @@ const GymOwnerDashboardPage = () => {
       if (error) throw error;
 
       setGym(gym.filter((gym) => gym.id !== elemId)); // Actualizar estado local
-      console.log("El elemento actualizado: ", updatedElement);
+      // console.log("El elemento actualizado: ", updatedElement);
     } catch (error) {
       console.log(`Error al eliminar gimnasio: ${error.message}`);
     }
@@ -354,12 +354,12 @@ const GymOwnerDashboardPage = () => {
   const handleGymChange = (e) => {
     // const selectedId = e.target.value;
     const selectedId = parseInt(e.target.value, 10);
-    console.log("el id del Gym elegido es:", selectedId, gym);
+    // console.log("el id del Gym elegido es:", selectedId, gym);
     setGymSeleccionadoClassEdit(e.target.value); //NOW
     // 1. Buscamos el objeto completo en nuestro array original usando el ID
     const gymData = gym.find((gym) => gym.id === selectedId);
 
-    console.log("el nombre del gym elegido es:", gymData);
+    // console.log("el nombre del gym elegido es:", gymData);
 
     // 2. Actualizamos el estado con ambos valores
     if (gymData) {
@@ -376,7 +376,7 @@ const GymOwnerDashboardPage = () => {
 
   const handleMisClasesGymChange = async (e) => {
     const selectedId = parseInt(e.target.value, 10);
-    console.log("el id del Gym elegido para mostrar clases:", selectedId, gym);
+    // console.log("el id del Gym elegido para mostrar clases:", selectedId, gym);
 
     const { data: updatedClasses, error: fetchError } = await supabase
       .from("classes")
@@ -483,7 +483,7 @@ const GymOwnerDashboardPage = () => {
         {gym && !loading && !error && classes.length === 0 && (
           <p>No hay gimnasio actualmente.</p>
         )}
-        {console.log("Antes de enviar a map:", gym, gymsClasses)}
+        {/* {console.log("Antes de enviar a map:", gym, gymsClasses)} */}
         <div className="flex flex-wrap justify-center">
           {Array.isArray(gym) &&
             !loading &&
@@ -674,7 +674,7 @@ const GymOwnerDashboardPage = () => {
           {!loading && !error && classes.length === 0 && (
             <p>No hay clases programadas.</p>
           )}
-          {console.log("Array de clases antes del map: ", classes)}
+          {/* {console.log("Array de clases antes del map: ", classes)} */}
           {!loading &&
             !error &&
             classes.map((cls) => (
