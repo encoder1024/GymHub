@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { supabase } from "../supabaseClient";
+import OneSignal from "react-onesignal";
 
 const Navbar = () => {
   const { session, profile, loading } = useAuth();
@@ -10,6 +11,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    await OneSignal.logout();
     setIsOpen(false);
     navigate("/");
   };
