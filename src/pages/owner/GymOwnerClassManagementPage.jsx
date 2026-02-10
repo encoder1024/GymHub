@@ -57,7 +57,7 @@ const GymOwnerClassManagementPage = () => {
           return;
         }
         setGym(gymData);
-        console.log("Fetched gymData:", gymData); // Add this log
+        // console.log("Fetched gymData:", gymData); // Add this log
 
         // 3. Fetch classes for this gym
         const { data: classesData, error: classesError } = await supabase

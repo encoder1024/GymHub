@@ -22,13 +22,13 @@ const MyBookingsPage = () => {
   const urlParams = new URLSearchParams(window.location.search);
   let gymNamefromMap = urlParams.get("name");
   let gymIdfromMap = urlParams.get("id");
-  console.log(gymIdfromMap); // Aquí tenés el valor pasado
+  // console.log(gymIdfromMap); // Aquí tenés el valor pasado
 
   // Esta es la función que pasaremos como parámetro
   const manejarSeleccion = async (opcion) => {
     if (opcion) {
-      console.log("ID del Gym elegido:", opcion.value);
-      console.log("Nombre del Gym elegido:", opcion.label);
+      // console.log("ID del Gym elegido:", opcion.value);
+      // console.log("Nombre del Gym elegido:", opcion.label);
 
       // Guardamos la elección en el estado del padre
       setGymSeleccionado(opcion);
@@ -52,7 +52,7 @@ const MyBookingsPage = () => {
 
         if (classesError) throw classesError;
 
-        console.log("estas son las clases:", classesData);
+        // console.log("estas son las clases:", classesData);
         setClasses(classesData);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -184,11 +184,11 @@ const MyBookingsPage = () => {
   const handleReservas = (reservClass, reservGym) => {
     const planoGym = reservGym && reservGym[0];
 
-    console.log(
-      "llegué a la función que carga la reserva... y los parametros?",
-      reservClass,
-      planoGym,
-    ); //NOW
+    // console.log(
+    //   "llegué a la función que carga la reserva... y los parametros?",
+    //   reservClass,
+    //   planoGym,
+    // ); //NOW
     navigate("/user/book-checkout", {
       state: {
         clase: reservClass,

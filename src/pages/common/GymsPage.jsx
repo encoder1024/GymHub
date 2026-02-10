@@ -75,7 +75,7 @@ const GymsPage = () => {
         async (position) => {
           const { latitude, longitude } = position.coords;
           // setUserLocation({ lat: latitude, lng: longitude });
-          console.log("geoPosición actual: ", latitude, longitude);
+          // console.log("geoPosición actual: ", latitude, longitude);
 
           // 2. Llamar a la función RPC de Supabase para obtener gimnasios cercanos
           try {
@@ -88,9 +88,9 @@ const GymsPage = () => {
               "get_all_gyms_with_coords_json",
             );
 
-            console.log("cantidad de gyms con coordenadas: ", data.length); // Aquí verás el número real total
+            // console.log("cantidad de gyms con coordenadas: ", data.length); // Aquí verás el número real total
 
-            console.log("los gym: ", data);
+            // console.log("los gym: ", data);
 
             setGyms(data);
 

@@ -60,7 +60,7 @@ const ProfilePage = () => {
     if (phoneRegex.test(sinEspacios)) {
       setError("");
       // Aquí procedés con tu CrudUpdate o insert en gymsSantaFe
-      console.log("Teléfono válido, enviando a Supabase...");
+      // console.log("Teléfono válido, enviando a Supabase...");
       try {
         const { error } = await supabase
           .from("profiles")
