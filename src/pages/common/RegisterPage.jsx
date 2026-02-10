@@ -9,6 +9,7 @@ import {
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
+import Link from "react-router-dom";
 
 const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
