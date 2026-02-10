@@ -15,9 +15,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      console.log("Attempting login with:", { email, password });
-
-      const { data, error: apiError } = await supabase.auth.signInWithPassword({
+      const { error: apiError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -26,15 +24,15 @@ const LoginPage = () => {
         throw apiError;
       }
 
-      console.log("Login successful, navigating to /profile");
+      // console.log("Login successful, navigating to /profile");
       navigate("/profile"); // Redirige al perfil si el login es exitoso
-      console.log("Supabase signInWithPassword result:", { data, apiError });
+
     } catch (err) {
       console.error("Login error:", err.message);
       setError(err.message);
     } finally {
       setLoading(false);
-      console.log("Login process finished, loading set to false.");
+      // console.log("Login process finished, loading set to false.");
     }
   };
 

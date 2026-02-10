@@ -17,7 +17,7 @@ const BookCheckoutPage = () => {
     session: [],
   };
 
-  console.log("valores: ", clase, gym, profile, session);
+  // console.log("valores: ", clase, gym, profile, session);
 
   const startTime = new Date(clase.start_time).toLocaleTimeString([], {
     hour: "2-digit",

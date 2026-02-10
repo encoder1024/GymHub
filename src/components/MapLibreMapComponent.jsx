@@ -28,9 +28,9 @@ export default function MapTilerComponent({ gymsArray }) {
         const { latitude, longitude } = position.coords;
         // setUserLat(latitude);
         // setUserLong(longitude);
-        console.log(`Latitud: ${latitude}`);
-        console.log(`Longitud: ${longitude}`);
-        console.log("Posición completa:", position);
+        // console.log(`Latitud: ${latitude}`);
+        // console.log(`Longitud: ${longitude}`);
+        // console.log("Posición completa:", position);
       },
       // Error: callback si el usuario niega el permiso o hay error
       (error) => {
@@ -46,7 +46,7 @@ export default function MapTilerComponent({ gymsArray }) {
       center: [lng, lat],
       zoom: zoom,
     });
-    console.log("gyms a mostrar:", gymsArray);
+    // console.log("gyms a mostrar:", gymsArray);
 
     // --- Lógica para agregar marcadores ---
     gymsArray.forEach((gym) => {

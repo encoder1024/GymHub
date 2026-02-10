@@ -39,7 +39,7 @@ const GymOwnerBookingListPage = () => {
 
         const urlParams = new URLSearchParams(window.location.search);
         const gymIdfromMap = urlParams.get("id");
-        console.log(gymIdfromMap); // Aquí tenés el valor pasado
+        // console.log(gymIdfromMap); // Aquí tenés el valor pasado
 
         if (gymIdfromMap) {
           const { data: gymData, error: gymError } = await supabase
@@ -55,14 +55,14 @@ const GymOwnerBookingListPage = () => {
             return;
           }
           setGym(gymData);
-          console.log("estos son los arrays: ", gymData);
+          // console.log("estos son los arrays: ", gymData);
 
           // 3. Fetch bookings for classes belonging to this gym
           const { data: bookingsData, error: bookingsError } =
             await supabase.rpc("get_confirmed_gym_bookings", {
               target_gym_id: gymData[0].id,
             });
-          console.log("el gym con las clases de las reservas: ", bookingsData);
+          // console.log("el gym con las clases de las reservas: ", bookingsData);
 
           if (bookingsError) throw bookingsError;
           setBookings(bookingsData);
@@ -89,7 +89,7 @@ const GymOwnerBookingListPage = () => {
             await supabase.rpc("get_confirmed_gym_bookings", {
               target_gym_id: gymData[0].id,
             });
-          console.log("el gym con las clases de las reservas: ", bookingsData);
+          // console.log("el gym con las clases de las reservas: ", bookingsData);
           if (bookingsError) throw bookingsError;
           setBookings(bookingsData);
         }
@@ -106,17 +106,17 @@ const GymOwnerBookingListPage = () => {
 
   const handleMisReservasGymChange = async (e) => {
     const selectedId = parseInt(e.target.value, 10);
-    console.log(
-      "el id del Gym elegido para mostrar reservas:",
-      selectedId,
-      gym,
-    );
-    console.log(
-      "el id del Gym elegido para mostrar reservas:",
-      selectedId,
-      gym[selectedId].id,
-      gym,
-    );
+    // console.log(
+    //   "el id del Gym elegido para mostrar reservas:",
+    //   selectedId,
+    //   gym,
+    // );
+    // console.log(
+    //   "el id del Gym elegido para mostrar reservas:",
+    //   selectedId,
+    //   gym[selectedId].id,
+    //   gym,
+    // );
     const { data: updatedBookings, error: fetchError } = await supabase.rpc(
       "get_confirmed_gym_bookings",
       {
@@ -125,7 +125,7 @@ const GymOwnerBookingListPage = () => {
     );
 
     if (!fetchError) setBookings(updatedBookings);
-    console.log("las reservas actualizadas: ", updatedBookings);
+    // console.log("las reservas actualizadas: ", updatedBookings);
   };
 
   const handleDeleteBooking = async (bookId) => {
@@ -171,7 +171,7 @@ const GymOwnerBookingListPage = () => {
         <p className="tc">Aún no hay reservas para tus clases.</p>
       )}
 
-      {console.log("bookings: ", bookings)}
+      {/* {console.log("bookings: ", bookings)} */}
       {!loading && !error && gym && bookings.length > 0 && (
         <div className="flex flex-wrap justify-center">
           {bookings.map((booking) => (

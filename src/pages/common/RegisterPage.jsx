@@ -36,7 +36,7 @@ const RegisterPage = () => {
     if (phoneRegex.test(sinEspacios) && emailRegex.test(email)) {
       setError("");
       // Aquí procedés con tu CrudUpdate o insert en gymsSantaFe
-      console.log("Teléfono válido y el email válido, enviando a Supabase...");
+      // console.log("Teléfono válido y el email válido, enviando a Supabase...");
       try {
         // 1. Registrar el usuario en Supabase Auth
         await supabase.auth.signUp({
