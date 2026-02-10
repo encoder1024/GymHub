@@ -18,49 +18,7 @@ import NotFoundPage from "./pages/common/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import BookCheckoutPage from "./pages/user/BookCheckoutPage";
 
-import OneSignal from "react-onesignal";
-import { useEffect } from "react";
-import { supabase } from "./supabaseClient";
-
 function App() {
-  useEffect(() => {
-    // // Inicializar OneSignal
-    // OneSignal.init({
-    //   appId: "e346f85b-406b-42a7-9f32-110cce9dba56",
-    //   allowLocalhostAsSecureOrigin: true, // Útil para desarrollo con Vite
-    // });
-
-    // // Vincular con el usuario de Supabase al iniciar sesión
-    // const syncUser = async () => {
-    //   const {
-    //     data: { user },
-    //   } = await supabase.auth.getUser();
-    //   if (user) {
-    //     await OneSignal.login(user.id); // Sincroniza el ID de Supabase como External ID
-    //     console.log("llegamos acá: ", user.id);
-    //   }
-    // };
-
-    // syncUser();
-
-    const init = async () => {
-      await OneSignal.init({
-        appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
-        allowLocalhostAsSecureOrigin: true,
-      });
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        await OneSignal.login(user.id);
-        console.log("OneSignal login:", user.id);
-      }
-    };
-
-    init();
-  }, []);
-
   return (
     <div>
       <Navbar />
