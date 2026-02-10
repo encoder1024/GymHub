@@ -279,7 +279,7 @@ const MyBookingsPage = () => {
                   classInfo={cls}
                   gymInfo={gymActual}
                   onBook={handleReservas}
-                  tabla="SantaFe" // Pasa la función onBook a ClassCard
+                  tabla="SantaFe" // Pasa la función onBook a ClassCard sea lo que sea
                 />
               ))}
             </div>
