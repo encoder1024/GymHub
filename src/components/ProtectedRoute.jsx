@@ -17,6 +17,7 @@ const ProtectedRoute = ({ children, roles }) => {
 
   if (roles && !roles.includes(profile?.role)) {
     // Si el rol del usuario no está permitido, redirige a una página de "no autorizado" o "no encontrado"
+    console.log("estos son los valores: ", roles, profile, session)
     return <Navigate to="/not-found" replace />;
   }
 

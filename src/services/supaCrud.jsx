@@ -120,7 +120,7 @@ export const CrudInsert = async (elemId, tabla, elemData) => {
     try {
       const { error, dataIns } = await supabase
         .from(tabla)
-        .insert([elemData])
+        .insert(elemData)
         .select("id")
         .single();
 

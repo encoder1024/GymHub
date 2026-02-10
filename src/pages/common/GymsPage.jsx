@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom"; // Importar useNavigate
-import { supabase } from "../supabaseClient";
-import GymCard from "../components/GymCard";
-import ClassCard from "../components/ClassCard"; // Importar ClassCard
-import MapLibreMapComponent from "../components/MapLibreMapComponent";
-import { cargaDBSantaFe } from "../services/santaFeService";
+import { supabase } from "../../supabaseClient";
+import GymCard from "../../components/GymCard";
+// import ClassCard from "../components/ClassCard"; // Importar ClassCard
+import MapLibreMapComponent from "../../components/MapLibreMapComponent";
+// import { cargaDBSantaFe } from "../services/santaFeService";
 
 const GymsPage = () => {
   const { session } = useAuth();
   const navigate = useNavigate(); // Hook para navegación programática
-  const [userLocation, setUserLocation] = useState(null);
+  // const [userLocation, setUserLocation] = useState(null);
   const [gyms, setGyms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -74,7 +74,8 @@ const GymsPage = () => {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          setUserLocation({ lat: latitude, lng: longitude });
+          // setUserLocation({ lat: latitude, lng: longitude });
+          console.log("geoPosición actual: ", latitude, longitude);
 
           // 2. Llamar a la función RPC de Supabase para obtener gimnasios cercanos
           try {
@@ -89,7 +90,7 @@ const GymsPage = () => {
 
             console.log("cantidad de gyms con coordenadas: ", data.length); // Aquí verás el número real total
 
-            console.log("los gym cercanos", data);
+            console.log("los gym: ", data);
 
             setGyms(data);
 
@@ -151,7 +152,7 @@ const GymsPage = () => {
       // Asumiendo que 'classes' table has a 'capacity' column and we need to check/decrement it.
       // For simplicity, this example doesn't handle capacity checks here; it would be done in an RLS policy or a server function.
 
-      const { data, error } = await supabase.from("bookings").insert([
+      const { error } = await supabase.from("bookings").insert([
         {
           user_id: session.user.id,
           class_id: classInfo.id,
@@ -171,7 +172,7 @@ const GymsPage = () => {
 
   return (
     <div className="pa4">
-      <h1 className="f2">Explora Gimnasios Cercanos</h1>
+      <h1 className="f3">Explora Gimnasios Cercanos</h1>
       {error && <p className="f6 red">{error}</p>}
 
       {loading && <p>Cargando mapa y gimnasios...</p>}
@@ -183,12 +184,12 @@ const GymsPage = () => {
 
         {/* Sección de Lista de Gimnasios */}
         <div className="w-100 w-40-l pl3-l">
-          <h2 className="f3">Gimnasios Cercanos</h2>
+          {/* <h2 className="f3">Gimnasios Cercanos</h2> */}
           {loading && !error && <p>Cargando gimnasios...</p>}
           {!loading && !error && gyms.length === 0 && (
             <p>No se encontraron gimnasios cerca.</p>
           )}
-          {!loading && !error && gyms.length > 0 && (
+          {false && !loading && !error && gyms.length > 0 && (
             <div className="flex flex-column items-center">
               {gyms.map((gym) => (
                 <div key={gym.id} className="mb3 w-100">

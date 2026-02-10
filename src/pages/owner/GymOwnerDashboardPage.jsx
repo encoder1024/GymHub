@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { supabase } from "../supabaseClient";
-import { useAuth } from "../hooks/useAuth"; // Para obtener el usuario actual
-import ClassCard from "../components/ClassCard"; // Importar ClassCard
-import { CrudDelete, CrudUpdate } from "../services/supaCrud";
-import GymCardDash from "../components/GymCardDash";
+import { supabase } from "../../supabaseClient";
+import { useAuth } from "../../hooks/useAuth"; // Para obtener el usuario actual
+import ClassCard from "../../components/ClassCard"; // Importar ClassCard
+import { CrudDelete, CrudUpdate } from "../../services/supaCrud";
+import GymCardDash from "../../components/GymCardDash";
 import { animateScroll as scroll } from "react-scroll"; // Alias para mayor comodidad
 
 const GymOwnerDashboardPage = () => {

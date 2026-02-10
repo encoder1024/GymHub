@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../../supabaseClient";
 import {
   Mail,
   Lock,
@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 
 const RegisterPage = () => {
-
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [email, setEmail] = useState("");
@@ -29,7 +28,7 @@ const RegisterPage = () => {
 
     // 2. La regex valida: +54 + (opcional 9) + (área) + (número)
     // Total de dígitos después del +54 debe ser 10 u 11
-    const phoneRegex =/^\+549?\d{10}$/;
+    const phoneRegex = /^\+549?\d{10}$/;
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -39,20 +38,18 @@ const RegisterPage = () => {
       console.log("Teléfono válido y el email válido, enviando a Supabase...");
       try {
         // 1. Registrar el usuario en Supabase Auth
-        await supabase.auth.signUp(
-          {
-            email,
-            password,
-            options: {
-              data: {
-                full_name: fullName,
-                email: email,
-                phone: sinEspacios,
-                // El rol se establecerá por defecto como 'cliente' en la tabla profiles
-              },
+        await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName,
+              email: email,
+              phone: sinEspacios,
+              // El rol se establecerá por defecto como 'cliente' en la tabla profiles
             },
           },
-        );
+        });
         setSuccess(true);
       } catch (error) {
         setError(

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { supabase } from "../supabaseClient";
-import { useAuth } from "../hooks/useAuth";
-import { CrudDelete } from "../services/supaCrud";
+import { supabase } from "../../supabaseClient";
+import { useAuth } from "../../hooks/useAuth";
+import { CrudDelete } from "../../services/supaCrud";
 
 const GymOwnerBookingListPage = () => {
   const { session } = useAuth();
@@ -143,20 +143,22 @@ const GymOwnerBookingListPage = () => {
   return (
     <div className="pa4">
       <h1 className="f2 tc mb4">Reservas de Mis Clases</h1>
-      {!loading && !error && !gym && (<select
-        name="gymId" // Importante para identificar el campo
-        value={gym.id}
-        onChange={handleMisReservasGymChange}
-        required
-        className="w-full p-2 border border-gray-300 rounded"
-      >
-        {/* <option value="">Seleccioná uno...</option> */}
-        {gym.map((gym, i) => (
-          <option key={gym.id} value={i}>
-            {gym.name}
-          </option>
-        ))}
-      </select>)}
+      {!loading && !error && !gym && (
+        <select
+          name="gymId" // Importante para identificar el campo
+          value={gym.id}
+          onChange={handleMisReservasGymChange}
+          required
+          className="w-full p-2 border border-gray-300 rounded"
+        >
+          {/* <option value="">Seleccioná uno...</option> */}
+          {gym.map((gym, i) => (
+            <option key={gym.id} value={i}>
+              {gym.name}
+            </option>
+          ))}
+        </select>
+      )}
 
       {loading && <p>Cargando reservas...</p>}
       {error && <p className="f6 red">{error}</p>}

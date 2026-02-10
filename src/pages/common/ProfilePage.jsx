@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../hooks/useAuth";
-import { supabase } from "../supabaseClient";
+import { useAuth } from "../../hooks/useAuth";
+import { supabase } from "../../supabaseClient";
 
 const ProfilePage = () => {
   const { session } = useAuth();
@@ -55,7 +55,7 @@ const ProfilePage = () => {
 
     // 2. La regex valida: +54 + (opcional 9) + (área) + (número)
     // Total de dígitos después del +54 debe ser 10 u 11
-    const phoneRegex =/^\+549?\d{10}$/;
+    const phoneRegex = /^\+549?\d{10}$/;
 
     if (phoneRegex.test(sinEspacios)) {
       setError("");
@@ -77,9 +77,7 @@ const ProfilePage = () => {
         setIsUpdating(false);
       }
     } else {
-      setError(
-        "El formato del teléfono no es válido. Ej: +54 341 4810169",
-      );
+      setError("El formato del teléfono no es válido. Ej: +54 341 4810169");
       setLoading(false);
     }
   };
