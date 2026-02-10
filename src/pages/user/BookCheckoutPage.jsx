@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import WhatsAppHelp from "../../components/WhatsappHelp";
+import WhatsAppHelp from "../../components/WhatsAppHelp";
 import { CrudInsert } from "../../services/supaCrud";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "../../supabaseClient";
