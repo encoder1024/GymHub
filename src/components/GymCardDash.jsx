@@ -5,7 +5,7 @@ const GymCardDash = ({gymInfo, cantClases}) => { // Recibe gym
   // console.log("Elementos recibidos:", cantClases)
 
   return (
-    <div className="bg-white br3 w-100 w-100-m w-100-l flex flex-column justify-between">
+    <div className="bg-gray br3 w-100 w-100-m w-100-l flex flex-column justify-between">
       {/* Imagen del gimnasio (placeholder) */}
       <div className="w-100 w-40-l pa2">
         <img src="https://placehold.co/600x400/000000/FFFFFF/png?text=Gym" className="db w-100 h-auto br2 br--top-l" alt="Foto de un gimnasio." />

@@ -1,0 +1,84 @@
+CREATE OR REPLACE FUNCTION copy_gym_approved_to_santa_fe(gym_id int8)
+RETURNS text AS $$
+DECLARE
+    v_gym_record RECORD;
+    v_exists boolean;
+BEGIN
+    -- 1. Obtener el registro de la tabla origen
+    SELECT * INTO v_gym_record FROM gyms WHERE id = gym_id;
+
+    -- 2. Validar existencia en origen
+    IF v_gym_record IS NULL THEN
+        RAISE EXCEPTION 'Error: No se encontró un gimnasio con el ID %', gym_id;
+    END IF;
+
+    -- 3. Validar duplicados en destino (por nombre y dueño)
+    SELECT EXISTS (
+        SELECT 1 FROM "gymsSantaFe" 
+        WHERE title = v_gym_record.name 
+          AND owner_id = v_gym_record.owner_id
+    ) INTO v_exists;
+
+    IF v_exists THEN
+        RAISE EXCEPTION 'El gimnasio "%" ya existe en la tabla gymsSantaFe.', v_gym_record.name;
+    END IF;
+
+    -- 4. Inserción completa con todos los valores por defecto solicitados
+    INSERT INTO "gymsSantaFe" (
+        owner_id,
+        title,          -- name -> title
+        is_approved,
+        is_deleted,
+        created_at,
+        location,       -- location_coords -> location
+        phone,          
+        website,        -- Agregado
+        url,            -- Agregado
+        category_name,  -- Agregado
+        total_score,
+        reviews_count,
+        street,
+        city,
+        state,
+        country_code,
+        phone_status,
+        updated_at
+    )
+    VALUES (
+        v_gym_record.owner_id,
+        v_gym_record.name,
+        v_gym_record.is_approved,
+        v_gym_record.is_deleted,
+        v_gym_record.created_at,
+        v_gym_record.location_coords,
+        'Sin teléfono', 
+        'https://ejemplo.com', -- website por defecto
+        'https://ejemplo.com', -- url por defecto
+        'Gimnasio',            -- category_name por defecto
+        0,              
+        0,              
+        'Pendiente',    
+        'Santa Fe',     
+        'Santa Fe',     
+        'AR',           
+        false,          
+        NOW()           
+    );
+
+    RETURN 'Gimnasio "' || v_gym_record.name || '" copiado con éxito a gymsSantaFe.';
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
+-- código para la frontend en js:
+
+-- const { data, error } = await supabase
+--   .rpc('copy_gym_approved_to_santa_fe', { gym_id: 123 });
+
+-- if (error) {
+--   // Aquí verás: "El gimnasio 'Nombre' ya ha sido copiado..."
+--   alert('Error: ' + error.message);
+-- } else {
+--   alert(data); // "Gimnasio copiado exitosamente."
+-- }
+

@@ -1,0 +1,41 @@
+/* Aplicar al fondo de toda la página (Home) */
+body {
+    background-color: #393939;
+    margin: 0;
+    padding: 0;
+}
+
+/* Aplicar a la barra de navegación */
+/* Nota: Asegúrate de que tu componente Navbar use la etiqueta <nav> o la clase .navbar */
+nav, .navbar {
+    background-color: #393939 !important; /* El !important asegura que sobreescriba estilos previos */
+    border-bottom: 1px solid #333; /* Opcional: una línea sutil para separar si el contenido es claro */
+}
+
+/* Para que el texto sea legible sobre el gris */
+body, nav a {
+    color: #FFFFFF !important;
+    text-decoration: none;
+}
+
+div, form, button, p, a, input {
+    color: #FFFFFF
+}
+
+/* Le creo un color bien llamativo al boton hamburguesa */
+.btn-hamburguesa {
+    color: #CCFF00 !important; /* Amarillo flúor */
+    fill: currentColor; /* Si el icono es un SVG interno */
+}
+
+/*Esto pone en gris el contenedor del popup que genera Maplibre*/
+@layer base {
+  .maplibregl-popup-content {
+    background: #808080 !important;
+    color: #333 !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+  }
+}
+
+

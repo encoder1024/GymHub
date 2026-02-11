@@ -121,7 +121,7 @@ const ProfilePage = () => {
   return (
     <div className="pa4">
       <h1 className="f2">Mi Perfil</h1>
-      <div className="measure center pa4 bg-white shadow-1 br2">
+      <div className="measure center pa4 bg-gray shadow-1 br2">
         <form onSubmit={handleUpdateProfile}>
           <div className="mv3">
             <label className="db fw6 lh-copy f6" htmlFor="full-name">
