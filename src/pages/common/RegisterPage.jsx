@@ -34,24 +34,48 @@ const RegisterPage = () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (phoneRegex.test(sinEspacios) && emailRegex.test(email)) {
-      setError("");
-      // Aquí procedés con tu CrudUpdate o insert en gymsSantaFe
-      // console.log("Teléfono válido y el email válido, enviando a Supabase...");
+
+      const redirectBase = window.location.origin;
+      const redirectTo = `${redirectBase}/login`;
+
       try {
-        // 1. Registrar el usuario en Supabase Auth
-        await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: fullName,
-              email: email,
-              phone: sinEspacios,
-              // El rol se establecerá por defecto como 'cliente' en la tabla profiles
-            },
-          },
+        const { data: existing, error: profileError } = await supabase.rpc("email_exists", {
+          p_email: email,
         });
-        setSuccess(true);
+
+        if (profileError) {
+          setError("Hubo un problema verificando el email. Intentá de nuevo.");
+        }
+
+        if (existing) {
+          setError(
+            "Ese email ya está registrado. Podés iniciar sesión o recuperar tu contraseña.",
+          );
+          setSuccess(false);
+        } else {
+          // 1. Registrar el usuario en Supabase Auth
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            emailRedirectTo: redirectTo,
+            options: {
+              data: {
+                full_name: fullName,
+                email: email,
+                phone: sinEspacios,
+                // El rol se establecerá por defecto como 'cliente' en la tabla profiles
+              },
+            },
+          });
+
+          if (data) {
+            setSuccess(true);
+            console.log(data);
+          } else {
+            setSuccess(false);
+            console.log("Error de signUp:", error);
+          }
+        }
       } catch (error) {
         setError(
           error.message || "Error al registrarse. Intenta con otro email.",
@@ -64,6 +88,7 @@ const RegisterPage = () => {
         "El formato del teléfono no es válido. Ej: +54 341 4810169 o el formato del email: ejemplo@tudominio.com",
       );
       setLoading(false);
+      console.log("Error:", error);
     }
   };
 
