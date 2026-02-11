@@ -52,7 +52,7 @@ export default function MapTilerComponent({ gymsArray }) {
     gymsArray.forEach((gym) => {
       // Definimos el HTML del popup con un botón
       const htmlContent = `
-        <div style="text-align:center">
+        <div style="text-align:center; background:gray;">
           <h3>${gym.title}</h3>
           <p>${gym.category_name}</p>
           <p>${gym.phone}</p>

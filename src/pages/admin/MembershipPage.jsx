@@ -28,13 +28,13 @@ const MembershipPage = () => {
       <h1 className="f2 tc mb4">Elige tu Plan de Membresía</h1>
       <div className="flex flex-wrap justify-center items-center">
         {membershipPlans.map(plan => (
-          <div key={plan.id} className="bg-white shadow-1 br3 pa4 ma3 measure w-100 w-40-m w-30-l tc flex flex-column justify-between">
+          <div key={plan.id} className="bg-gray shadow-1 br3 pa4 ma3 measure w-100 w-40-m w-30-l tc flex flex-column justify-between">
             <h2 className="f3 mb2">{plan.name}</h2>
             <p className="f1 mv3">${plan.price.toFixed(0)}</p>
             <p className="f5 lh-copy mb4">{plan.description}</p>
             <button
               onClick={() => handleSelectPlan(plan)}
-              className="bn ph4 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib br2 link dim black mt-auto" // mt-auto para empujar el botón al final
+              className="bn ph4 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib br2 link dim withe mt-auto" // mt-auto para empujar el botón al final
             >
               Seleccionar Plan
             </button>
@@ -46,7 +46,7 @@ const MembershipPage = () => {
         <h2 className="f3 mb4">Acceso a Gimnasios Afiliados</h2>
         <p className="lh-copy measure center">Con tu membresía, podrás acceder a la red de gimnasios asociados.</p>
         <div className="flex flex-wrap justify-center mt3">
-           <Link to="/gyms" className="bn ph4 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib br2 link dim black">
+           <Link to="/gyms" className="bn ph4 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib br2 link dim white">
              Ver Gimnasios
            </Link>
         </div>

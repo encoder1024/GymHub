@@ -4,10 +4,10 @@ import GymCarouselA from "../../components/GymCarruselA";
 const HomePage = () => {
   return (
     <div className="pa4">
-      <h1 className="f2">Bienvenido a AppGymHub</h1>
+      <h1 className="f2">Bienvenido a GymHub</h1>
       <p className="lh-copy measure">
-        Tu lugar para acceder a los mejores gimnasios y estudios
-        de bienestar.
+        Tu lugar para acceder a los mejores gimnasios y actividades para tu
+        bienestar.
       </p>
       <div className="mt-6">
         {/* <GymCarousel /> */}
