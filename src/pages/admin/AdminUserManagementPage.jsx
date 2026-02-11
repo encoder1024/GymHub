@@ -81,11 +81,11 @@ const AdminUserManagementPage = () => {
           <table className="f6 w-100 mw8 center" cellSpacing="0">
             <thead>
               <tr>
-                <th className="fw6 bb b--black-20 tl pa3 bg-light-gray">Nombre</th>
-                <th className="fw6 bb b--black-20 tl pa3 bg-light-gray">Email</th>
-                <th className="fw6 bb b--black-20 tl pa3 bg-light-gray">Rol</th>
-                <th className="fw6 bb b--black-20 tl pa3 bg-light-gray">Estado</th>
-                <th className="fw6 bb b--black-20 tl pa3 bg-light-gray">Acciones</th>
+                <th className="fw6 bb b--black-20 tl pa3 bg-gray">Nombre</th>
+                <th className="fw6 bb b--black-20 tl pa3 bg-gray">Email</th>
+                <th className="fw6 bb b--black-20 tl pa3 bg-gray">Rol</th>
+                <th className="fw6 bb b--black-20 tl pa3 bg-gray">Estado</th>
+                <th className="fw6 bb b--black-20 tl pa3 bg-gray">Acciones</th>
               </tr>
             </thead>
             <tbody className="lh-copy">

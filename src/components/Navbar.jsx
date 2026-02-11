@@ -55,14 +55,14 @@ const Navbar = () => {
           onClick={() => setIsOpen(false)}
         >
           <img src="/vite.svg" className="dib w2 h2 br-100" alt="Logo" />
-          <span className="pl2 f5 fw6 dark-gray">AppGymHub</span>
+          <span className="pl2 f5 fw6">GymHub</span>
         </Link>
 
         {/* Botón Hamburguesa (dn-l = display: none en large screens) */}
         <div className="dn-l">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="bg-transparent bn pointer dark-gray focus-outline-none pa2"
+            className="bg-transparent bn pointer focus-outline-none pa2 btn-hamburguesa"
             aria-label="Menu"
           >
             {/* ... (Iconos SVG) ... */}
@@ -81,7 +81,7 @@ const Navbar = () => {
       <div
         className={`${
           isOpen
-            ? "db bg-near-white pa3 mt3 br2 bt b--light-gray shadow-1"
+            ? "db gray pa3 mt3 br2 bt b--light-gray shadow-1"
             : "dn"
         } dtc-l v-mid w-100 w-75-l tr-l mt0-l pa0-l bg-white-l bn-l shadow-none-l`}
       >

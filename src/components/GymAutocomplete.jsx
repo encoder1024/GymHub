@@ -25,10 +25,46 @@ const GymAutocomplete = ({ onSelectGym }) => {
     }));
   };
 
+  const customStyles = {
+    // El contenedor principal del input
+    control: (base, state) => ({
+      ...base,
+      backgroundColor: "#1A1A1A", // Gris oscuro del home
+      borderColor: state.isFocused ? "#ffffff" : "#333", // Borde blanco al hacer foco
+      boxShadow: "none",
+      "&:hover": { borderColor: "#ffffff" },
+    }),
+    // El menú desplegable
+    menu: (base) => ({
+      ...base,
+      backgroundColor: "#1A1A1A",
+      border: "1px solid #333",
+    }),
+    // Cada opción individual
+    option: (base, { isFocused, isSelected }) => ({
+      ...base,
+      backgroundColor: isSelected
+        ? "#ffffff" // Fondo si está seleccionado
+        : isFocused
+          ? "#333" // Fondo al pasar el mouse (hover)
+          : "#1A1A1A", // Fondo normal
+      color: isSelected
+        ? "#000000" // Texto si está seleccionado
+        : "#ffffff", // Texto normal y hover
+      cursor: "pointer",
+      "&:active": { backgroundColor: "#444" },
+    }),
+    // El texto que escribís y el placeholder
+    input: (base) => ({ ...base, color: "#ffffff" }),
+    singleValue: (base) => ({ ...base, color: "#ffffff" }),
+    placeholder: (base) => ({ ...base, color: "#888" }),
+  };
+
   return (
     <div className="flex">
       <div style={{ width: "500px" }}>
         <AsyncSelect
+          styles={customStyles} // <--- APLICAMOS LOS ESTILOS AQUÍ
           cacheOptions
           defaultOptions
           loadOptions={loadOptions}

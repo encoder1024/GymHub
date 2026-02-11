@@ -223,10 +223,10 @@ const MyBookingsPage = () => {
               {bookings.map((booking) => (
                 <div
                   key={booking.id}
-                  className="bg-white shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc"
+                  className="bg-gray shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc"
                 >
                   <h3 className="f4 mv0">{booking.classes_santa_fe.name}</h3>
-                  <p className="f6 lh-copy measure mid-gray">
+                  <p className="f6 lh-copy measure">
                     En: {booking.classes_santa_fe.gymsSantaFe.title}
                   </p>
                   <p className="f6 mt2">
@@ -272,7 +272,7 @@ const MyBookingsPage = () => {
         <div className="center pa2 br2 mb4">
           <h3 className="f5 mv2">Clases Disponibles:</h3>
           {classes.length > 0 ? (
-            <div className="flex flex-wrap justify-center gap-4 p-4">
+            <div className="flex flex-wrap justify-center gap-4 p-4 ">
               {classes.map((cls) => (
                 <ClassCard
                   key={cls.id}
