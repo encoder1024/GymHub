@@ -12,6 +12,7 @@
   "dependencies": {
     "@maptiler/sdk": "^3.11.0",
     "@supabase/supabase-js": "^2.91.1",
+    "embla-carousel-react": "^8.6.0",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
     "lucide-react": "^0.563.0",
@@ -25,6 +26,7 @@
     "react-router-dom": "^7.13.0",
     "react-scroll": "^1.9.3",
     "react-select": "^5.10.2",
+    "swiper": "^12.1.0",
     "tachyons": "^4.12.0"
   },
   "devDependencies": {
