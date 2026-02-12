@@ -35,6 +35,9 @@ const ProfilePage = () => {
 
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       window.OneSignalDeferred.push(async function (OneSignal) {
+        // Esperar a que el SW esté realmente activo
+        await navigator.serviceWorker.ready;
+
         await OneSignal.init({
           appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
           allowLocalhostAsSecureOrigin: true,
