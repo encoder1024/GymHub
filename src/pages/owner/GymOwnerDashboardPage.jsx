@@ -147,7 +147,7 @@ const GymOwnerDashboardPage = () => {
         setClasses(classesData);
 
         const { data, error } = await supabase.rpc("get_gym_classes_count");
-        console.log("Clases de los gyms: ", data);
+        // console.log("Clases de los gyms: ", data);
 
         if (error) {
           console.error("Error:", error.message);
@@ -162,7 +162,7 @@ const GymOwnerDashboardPage = () => {
               count: count,
             })),
           );
-          console.log("Clases de los gyms con formato: ", gymsClasses);
+          // console.log("Clases de los gyms con formato: ", gymsClasses);
         }
       } catch (error) {
         setError(error.message);
@@ -238,7 +238,7 @@ const GymOwnerDashboardPage = () => {
       capacity: parseInt(capacity, 10),
     };
 
-    console.log("La info antes de actualziar o crear una clase: ", classData, currentClass? currentClass.gym_id : formData.gymId);
+    // console.log("La info antes de actualziar o crear una clase: ", classData, currentClass? currentClass.gym_id : formData.gymId);
 
     try {
       let result = null;

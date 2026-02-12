@@ -2,7 +2,7 @@ import React from "react";
 
 const ClassCard = ({ classInfo, gymInfo, onBook, tabla }) => {
 
-   console.log("lo que recibe ClassCard:", classInfo, gymInfo, onBook)
+  //  console.log("lo que recibe ClassCard:", classInfo, gymInfo, onBook)
 
 if (!classInfo || !gymInfo || !onBook){return;}
 
