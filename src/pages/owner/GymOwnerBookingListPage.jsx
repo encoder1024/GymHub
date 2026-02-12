@@ -43,7 +43,7 @@ const GymOwnerBookingListPage = () => {
 
         if (gymIdfromMap) {
           const { data: gymData, error: gymError } = await supabase
-            .from("gyms")
+            .from("gymsSantaFe")
             .select("*")
             .eq("owner_id", session.user.id)
             .eq("id", gymIdfromMap);
@@ -59,7 +59,7 @@ const GymOwnerBookingListPage = () => {
 
           // 3. Fetch bookings for classes belonging to this gym
           const { data: bookingsData, error: bookingsError } =
-            await supabase.rpc("get_confirmed_gym_bookings", {
+            await supabase.rpc("get_confirmed_gym_bookings_santa_fe", {
               target_gym_id: gymData[0].id,
             });
           // console.log("el gym con las clases de las reservas: ", bookingsData);
@@ -69,7 +69,7 @@ const GymOwnerBookingListPage = () => {
         } else {
           // 2. Fetch the gym associated with this owner
           const { data: gymData, error: gymError } = await supabase
-            .from("gyms")
+            .from("gymsSantaFe")
             .select("*")
             .eq("owner_id", session.user.id)
             .eq("is_deleted", false)
@@ -86,7 +86,7 @@ const GymOwnerBookingListPage = () => {
           // 3. Fetch bookings for classes belonging to this gym
 
           const { data: bookingsData, error: bookingsError } =
-            await supabase.rpc("get_confirmed_gym_bookings", {
+            await supabase.rpc("get_confirmed_gym_bookings_santa_fe", {
               target_gym_id: gymData[0].id,
             });
           // console.log("el gym con las clases de las reservas: ", bookingsData);
@@ -106,19 +106,9 @@ const GymOwnerBookingListPage = () => {
 
   const handleMisReservasGymChange = async (e) => {
     const selectedId = parseInt(e.target.value, 10);
-    // console.log(
-    //   "el id del Gym elegido para mostrar reservas:",
-    //   selectedId,
-    //   gym,
-    // );
-    // console.log(
-    //   "el id del Gym elegido para mostrar reservas:",
-    //   selectedId,
-    //   gym[selectedId].id,
-    //   gym,
-    // );
+
     const { data: updatedBookings, error: fetchError } = await supabase.rpc(
-      "get_confirmed_gym_bookings",
+      "get_confirmed_gym_bookings_santa_fe",
       {
         target_gym_id: gym[selectedId].id,
       },
@@ -130,7 +120,7 @@ const GymOwnerBookingListPage = () => {
 
   const handleDeleteBooking = async (bookId) => {
     try {
-      const { error, elemId } = await CrudDelete(bookId, "bookings");
+      const { error, elemId } = await CrudDelete(bookId, "bookings_santa_fe");
 
       if (error) throw error;
 

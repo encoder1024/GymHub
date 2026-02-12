@@ -114,7 +114,10 @@ const GymOwnerDashboardPage = () => {
         //   .single();
 
         const { data: gymData, error: gymError } = await supabase.rpc(
-          "get_gyms_with_coords",
+          "get_gyms_by_owner_santa_fe",
+          {
+            owner_id_input: session.user.id,
+          },
         );
 
         if (gymError) throw gymError;
@@ -127,15 +130,16 @@ const GymOwnerDashboardPage = () => {
 
         // 3. Fetch classes for this gym
         const { data: classesData, error: classesError } = await supabase
-          .from("classes")
+          .from("classes_santa_fe")
           .select("*")
           .eq("gym_id", gymData[0].id)
-          .order("start_time", { ascending: true });
+          .order("start_time", { ascending: false });
 
         if (classesError) throw classesError;
         setClasses(classesData);
 
         const { data, error } = await supabase.rpc("get_gym_classes_count");
+        console.log("Clases de los gyms: ", data);
 
         if (error) {
           console.error("Error:", error.message);
@@ -145,8 +149,12 @@ const GymOwnerDashboardPage = () => {
           //   data,
           // );
           setGymsClasses(
-            Object.entries(data).map(([id, count]) => ({ id, count })),
+            Object.entries(data).map(([id, count]) => ({
+              id: Number(id), // Convertimos la llave (string) a número
+              count: count,
+            })),
           );
+          console.log("Clases de los gyms con formato: ", gymsClasses);
         }
       } catch (error) {
         setError(error.message);
@@ -221,14 +229,16 @@ const GymOwnerDashboardPage = () => {
       if (currentClass) {
         // Update existing class
         const { error } = await supabase
-          .from("classes")
+          .from("classes_santa_fe")
           .update(classData)
           .eq("id", currentClass.id);
         if (error) throw error;
         result = "Clase actualizada correctamente!";
       } else {
         // Create new class
-        const { error } = await supabase.from("classes").insert([classData]);
+        const { error } = await supabase
+          .from("classes_santa_fe")
+          .insert([classData]);
         if (error) throw error;
         result = "Clase creada correctamente!";
       }
@@ -236,10 +246,10 @@ const GymOwnerDashboardPage = () => {
       setIsFormOpen(false);
       // Refetch classes after submit
       const { data: updatedClasses, error: fetchError } = await supabase
-        .from("classes")
+        .from("classes_santa_fe")
         .select("*")
         .eq("gym_id", formData.gymId) // TODO: ver cuando tenga varios gym un owner y esto se haga dinámico.
-        .order("start_time", { ascending: true });
+        .order("start_time", { ascending: false });
       if (!fetchError) setClasses(updatedClasses);
 
       const { data, error } = await supabase.rpc("get_gym_classes_count");
@@ -289,14 +299,14 @@ const GymOwnerDashboardPage = () => {
         //FOLLOW TOMORROW: ya tenemos un gym
         // Update existing class
         const { error } = await supabase
-          .from("gyms")
+          .from("gymsSantaFe")
           .update(gymData)
           .eq("id", currentGym.id);
         if (error) throw error;
         result = "Gym actualizado correctamente!";
       } else {
         // Create new class
-        const { error } = await supabase.from("gyms").insert([gymData]);
+        const { error } = await supabase.from("gymsSantaFe").insert([gymData]);
         if (error) throw error;
         result = "Gym creado correctamente!";
       }
@@ -305,7 +315,7 @@ const GymOwnerDashboardPage = () => {
       // Refetch classes after submit
       // console.log(session.user.id)
       const { data: updatedGyms, error: fetchError } = await supabase.rpc(
-        "get_gyms_with_coords",
+        "get_all_gyms_location_santa_fe",
       );
 
       if (!fetchError) setGym(updatedGyms);
@@ -318,7 +328,7 @@ const GymOwnerDashboardPage = () => {
 
   const handleDeleteClass = async (classId) => {
     try {
-      const { error, elemId } = await CrudDelete(classId, "classes");
+      const { error, elemId } = await CrudDelete(classId, "classes_santa_fe");
 
       if (error) throw error;
 
@@ -332,7 +342,7 @@ const GymOwnerDashboardPage = () => {
     try {
       const { error, elemId, updatedElement } = await CrudUpdate(
         gymId,
-        "gyms",
+        "gymsSantaFe",
         { is_deleted: true },
         "¿Estás seguro de que quieres borrar este gimnasio?",
       );
@@ -379,10 +389,10 @@ const GymOwnerDashboardPage = () => {
     // console.log("el id del Gym elegido para mostrar clases:", selectedId, gym);
 
     const { data: updatedClasses, error: fetchError } = await supabase
-      .from("classes")
+      .from("classes_santa_fe")
       .select("*")
       .eq("gym_id", selectedId)
-      .order("start_time", { ascending: true });
+      .order("start_time", { ascending: false });
 
     if (!fetchError) setClasses(updatedClasses);
   };
@@ -493,6 +503,7 @@ const GymOwnerDashboardPage = () => {
                 key={gymInter.id}
                 className="bg-gray shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc flex flex-column justify-between"
               >
+                {console.log("Clases de los gyms con formato: ", gym)}
                 <GymCardDash
                   gymInfo={gymInter}
                   cantClases={gymsClasses[i]}
@@ -579,17 +590,6 @@ const GymOwnerDashboardPage = () => {
                     </option>
                   ))}
                 </select>
-
-                {/* <select
-                  value={seleccionado}
-                  onChange={(e) => setSeleccionado(e.target.value)}
-                >
-                  {opciones.map((opcion) => (
-                    <option key={opcion} value={opcion}>
-                      {opcion}
-                    </option>
-                  ))}
-                </select> */}
               </div>
               <div className="mv2">
                 <label
