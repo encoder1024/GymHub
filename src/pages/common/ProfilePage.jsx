@@ -21,25 +21,31 @@ const ProfilePage = () => {
       // });
 
       // 👉 Inicializar OneSignal
+      // window.OneSignalDeferred = window.OneSignalDeferred || [];
+      // window.OneSignalDeferred.push(async function (OneSignal) {
+      //   await OneSignal.init({
+      //     appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
+      //     // safari_web_id: "TU-SAFARI-WEB-ID", // obligatorio para iPhone
+      //     notifyButton: {
+      //       enable: true,
+      //     },
+      //     allowLocalhostAsSecureOrigin: true,
+      //   });
+      // });
+
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       window.OneSignalDeferred.push(async function (OneSignal) {
         await OneSignal.init({
           appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
-          // safari_web_id: "TU-SAFARI-WEB-ID", // obligatorio para iPhone
-          notifyButton: {
-            enable: true,
-          },
           allowLocalhostAsSecureOrigin: true,
         });
-      });
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        await OneSignal.login(user.id);
-        console.log("OneSignal login:", user.id);
-      }
+        // Esperar a que el usuario esté listo
+        await OneSignal.User.PushSubscription.waitUntilSubscribed();
+
+        // Recién ahora hacer login
+        await OneSignal.login(session.user.id);
+      });
     };
 
     init();
