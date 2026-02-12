@@ -15,10 +15,10 @@ const ProfilePage = () => {
 
     useEffect(() => {
     const init = async () => {
-      await OneSignal.init({
-        appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
-        allowLocalhostAsSecureOrigin: true,
-      });
+      // await OneSignal.init({
+      //   appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
+      //   allowLocalhostAsSecureOrigin: true,
+      // });
 
       const {
         data: { user },
