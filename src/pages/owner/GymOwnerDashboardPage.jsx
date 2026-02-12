@@ -23,6 +23,10 @@ const GymOwnerDashboardPage = () => {
   const [endTime, setEndTime] = useState("");
   const [capacity, setCapacity] = useState("");
   const [gymSeleccionadoClassEdit, setGymSeleccionadoClassEdit] = useState(0);
+  const [formData, setFormData] = useState({
+    gymId: "",
+    gymName: "",
+  });
 
   const [isFormOpenGym, setIsFormOpenGym] = useState(false);
   const [currentGym, setCurrentGym] = useState(null); // Para editar una clase existente
@@ -31,6 +35,10 @@ const GymOwnerDashboardPage = () => {
   const [locationGymLat, setLocationGymLat] = useState("");
   const [locationGymLng, setLocationGymLng] = useState("");
   const [locationGym, setLocationGym] = useState("");
+  const [direStreet, setDireStreet] = useState("");
+  const [direCity, setDireCity] = useState("");
+  const [direState, setDireState] = useState("");
+  const [direPhone, setDirePhone] = useState("");
 
   // Creamos la referencia
   const miReferencia = useRef(null); // al formulario de gym para hacer el scroll suave
@@ -194,16 +202,22 @@ const GymOwnerDashboardPage = () => {
     setDescriptionGym("");
     setLocationGym("");
     setIsFormOpenGym(true);
+    setDireStreet("");
+    setDireCity("");
+    setDireState("");
   };
 
   const openFormForEditGym = (gym) => {
     setCurrentGym(gym);
-    setNameGym(gym.name);
+    setNameGym(gym.title); //NOW REVISAR
     setDescriptionGym(gym.description || "");
     setLocationGym(gym.position);
     setLocationGymLat(gym.lng);
     setLocationGymLng(gym.lat);
     setIsFormOpenGym(true);
+    setDireStreet(gym.street);
+    setDireCity(gym.city);
+    setDireState(gym.state);
   };
 
   const handleClassSubmit = async (e) => {
@@ -216,13 +230,15 @@ const GymOwnerDashboardPage = () => {
     // console.log("El gym elegido al crear la clase:", formData);
 
     const classData = {
-      gym_id: formData.gymId,
+      gym_id: currentClass? currentClass.gym_id : formData.gymId,
       name: className,
       description: classDescription,
       start_time: new Date(startTime).toISOString(),
       end_time: new Date(endTime).toISOString(),
       capacity: parseInt(capacity, 10),
     };
+
+    console.log("La info antes de actualziar o crear una clase: ", classData, currentClass? currentClass.gym_id : formData.gymId);
 
     try {
       let result = null;
@@ -283,13 +299,36 @@ const GymOwnerDashboardPage = () => {
     // const lng = -58.3816;
 
     // IMPORTANTE: El orden es Longitud primero, luego Latitud
-    const pointWKT = `POINT(${locationGymLat} ${locationGymLng})`;
+    const pointWKT = `POINT(${locationGymLng} ${locationGymLat})`;
 
-    const gymData = {
+    const sinEspacios = direPhone.replace(/\s+/g, "");
+    // 2. La regex valida: +54 + (opcional 9) + (área) + (número)
+    // Total de dígitos después del +54 debe ser 10 u 11
+    const phoneRegex = /^\+549?\d{10}$/;
+
+    if (!phoneRegex.test(sinEspacios)) {
+      setError("El formato del teléfono no es válido. Ej: +54 341 4810169");
+      setLoading(false);
+      return;
+    }
+
+    const gymDataInsertGymsTable = {
       owner_id: session.user.id,
       name: nameGym,
       description: descriptionGym,
       location_coords: pointWKT,
+      phone: direPhone,
+    };
+
+    const gymDataUpdateSantaFe = {
+      owner_id: session.user.id,
+      title: nameGym,
+      category_name: descriptionGym,
+      location: pointWKT,
+      street: direStreet,
+      city: direCity,
+      state: direState,
+      phone: direPhone,
     };
 
     // console.log("en el submit del form debería ser null:", currentGym);
@@ -300,13 +339,15 @@ const GymOwnerDashboardPage = () => {
         // Update existing class
         const { error } = await supabase
           .from("gymsSantaFe")
-          .update(gymData)
+          .update(gymDataUpdateSantaFe)
           .eq("id", currentGym.id);
         if (error) throw error;
         result = "Gym actualizado correctamente!";
       } else {
         // Create new class
-        const { error } = await supabase.from("gymsSantaFe").insert([gymData]);
+        const { error } = await supabase
+          .from("gyms")
+          .insert([gymDataInsertGymsTable]);
         if (error) throw error;
         result = "Gym creado correctamente!";
       }
@@ -315,7 +356,10 @@ const GymOwnerDashboardPage = () => {
       // Refetch classes after submit
       // console.log(session.user.id)
       const { data: updatedGyms, error: fetchError } = await supabase.rpc(
-        "get_all_gyms_location_santa_fe",
+        "get_gyms_by_owner_santa_fe",
+        {
+          owner_id_input: session.user.id,
+        },
       );
 
       if (!fetchError) setGym(updatedGyms);
@@ -340,7 +384,7 @@ const GymOwnerDashboardPage = () => {
 
   const handleDeleteGym = async (gymId) => {
     try {
-      const { error, elemId, updatedElement } = await CrudUpdate(
+      const { error, elemId } = await CrudUpdate(
         gymId,
         "gymsSantaFe",
         { is_deleted: true },
@@ -355,11 +399,6 @@ const GymOwnerDashboardPage = () => {
       console.log(`Error al eliminar gimnasio: ${error.message}`);
     }
   };
-
-  const [formData, setFormData] = useState({
-    gymId: "",
-    gymName: "",
-  });
 
   const handleGymChange = (e) => {
     // const selectedId = e.target.value;
@@ -411,7 +450,7 @@ const GymOwnerDashboardPage = () => {
           </button>
         </h2>
         {isFormOpenGym && (
-          <div className="measure center pa4 bg-light-gray shadow-1 br2 mb4">
+          <div className="measure center pa4 bg-gray shadow-1 br2 mb4">
             <h3 className="f4 mb3">
               {currentGym ? "Editar Gym" : "Nuevo Gym"}
             </h3>
@@ -443,6 +482,25 @@ const GymOwnerDashboardPage = () => {
                   onChange={(e) => setDescriptionGym(e.target.value)}
                 />
               </div>
+              <div className="mt3">
+                <label className="db fw6 lh-copy f6" htmlFor="dire-phone">
+                  Teléfono
+                </label>
+                <input
+                  className={
+                    error
+                      ? "border-red-500 pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
+                      : "pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
+                  }
+                  type="tel"
+                  name="phone"
+                  id="phone"
+                  value={direPhone}
+                  onChange={(e) => setDirePhone(e.target.value)}
+                  placeholder="+54 341 4810169"
+                  required
+                />
+              </div>
               <div className="mv2 flex justify-between">
                 <div>
                   <label className="db fw6 lh-copy f6" htmlFor="start-time">
@@ -468,6 +526,46 @@ const GymOwnerDashboardPage = () => {
                   />
                 </div>
               </div>
+              <div className="mv2">
+                <label className="db fw6 lh-copy f6" htmlFor="dire-street">
+                  Dirección: Calle y número
+                </label>
+                <input
+                  className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
+                  type="text"
+                  id="dire-street"
+                  value={direStreet}
+                  onChange={(e) => setDireStreet(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mv2">
+                <label className="db fw6 lh-copy f6" htmlFor="dire-city">
+                  Dirección: Ciudad
+                </label>
+                <input
+                  className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
+                  type="text"
+                  id="dire-city"
+                  value={direCity}
+                  onChange={(e) => setDireCity(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mv2">
+                <label className="db fw6 lh-copy f6" htmlFor="dire-state">
+                  Dirección: Provincia
+                </label>
+                <input
+                  className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
+                  type="text"
+                  id="dire-state"
+                  value={direState}
+                  onChange={(e) => setDireState(e.target.value)}
+                  required
+                />
+              </div>
+
               {error && <p className="f6 red">{error}</p>}
               <button
                 type="submit"
@@ -548,13 +646,13 @@ const GymOwnerDashboardPage = () => {
           {/* <option value="">Seleccioná uno...</option> */}
           {gym.map((gym) => (
             <option key={gym.id} value={gym.id}>
-              {gym.name}
+              {gym.title}
             </option>
           ))}
         </select>
 
         {isFormOpen && (
-          <div className="measure center pa4 bg-light-gray shadow-1 br2 mb4">
+          <div className="measure center pa4 bg-gray shadow-1 br2 mb4">
             <h3 className="f4 mb3">
               {currentClass ? "Editar Clase" : "Nueva Clase"}
             </h3>
@@ -586,7 +684,7 @@ const GymOwnerDashboardPage = () => {
                   <option value="">Seleccioná uno...</option>
                   {gym.map((gym) => (
                     <option key={gym.id} value={gym.id}>
-                      {gym.name}
+                      {gym.title}
                     </option>
                   ))}
                 </select>
@@ -688,9 +786,10 @@ const GymOwnerDashboardPage = () => {
                   // Dummy onBook for ahora, actual logic will be handled later or if class is booked from gym page
                   onBook={() =>
                     alert(
-                      "Reserva simulada. Iría a una página de confirmación o lógica de pago.",
+                      "El cartel solo confirma que está disponible para reservar para los clientes.",
                     )
                   }
+                  tabla="SantaFe"
                 />
                 <div className="mt3 flex justify-center gap-2">
                   <button

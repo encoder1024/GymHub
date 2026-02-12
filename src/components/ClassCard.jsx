@@ -2,7 +2,7 @@ import React from "react";
 
 const ClassCard = ({ classInfo, gymInfo, onBook, tabla }) => {
 
-  // console.log("lo que recibe ClassCard:", classInfo, gymInfo, onBook)
+   console.log("lo que recibe ClassCard:", classInfo, gymInfo, onBook)
 
 if (!classInfo || !gymInfo || !onBook){return;}
 
@@ -36,7 +36,7 @@ if (!classInfo || !gymInfo || !onBook){return;}
   return (
     <div className="bg-gray shadow-1 br3 w-full sm:w-72 flex flex-column justify-between ma2">
       <h3 className="ma1 pa1 f4 mv0 withe">{classInfo.name}</h3>
-      <h4 className="ma1 pa1 f4 mv0">{resultGymName}</h4>
+      <h4 className="ma1 pa1 f4 mv0 withe">{resultGymName}</h4>
       <p className="ma1 f6 mt2">{classInfo.description}</p>
       <p className="ma1 f6 mt2">
         <strong>Fecha:</strong> {startDate}
