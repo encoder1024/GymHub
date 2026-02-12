@@ -13,43 +13,59 @@ const ProfilePage = () => {
   const [role, setRole] = useState(""); // El rol debe ser visible pero no editable por el usuario común
   const [phone, setPhone] = useState("");
 
+  // useEffect(() => {
+  //   const initOneSignal = async () => {
+  //     // Adentro del useEffect
+  //     await OneSignal.init({
+  //       appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
+  //       allowLocalhostAsSecureOrigin: true,
+  //     });
+  //     await OneSignal.login(session.user.id);
+  //   };
+
+  //   initOneSignal();
+  // }, [session?.user?.id]);
+
   useEffect(() => {
-    const init = async () => {
-      // await OneSignal.init({
-      //   appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
-      //   allowLocalhostAsSecureOrigin: true,
-      // });
+  const setupOneSignal = async () => {
+    // Definimos la función de inicialización
+    const runInit = async () => {
+      const os = window.OneSignal;
+      if (!os) return;
 
-      // 👉 Inicializar OneSignal
-      // window.OneSignalDeferred = window.OneSignalDeferred || [];
-      // window.OneSignalDeferred.push(async function (OneSignal) {
-      //   await OneSignal.init({
-      //     appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
-      //     // safari_web_id: "TU-SAFARI-WEB-ID", // obligatorio para iPhone
-      //     notifyButton: {
-      //       enable: true,
-      //     },
-      //     allowLocalhostAsSecureOrigin: true,
-      //   });
-      // });
+      try {
+        // Solo inicializar si no se hizo ya
+        if (!os.initialized) {
+          await os.init({
+            appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
+            allowLocalhostAsSecureOrigin: true,
+            serviceWorkerPath: "OneSignalSDKWorker.js",
+          });
+        }
 
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-      window.OneSignalDeferred.push(async function (OneSignal) {
-        // Esperar a que el SW esté realmente activo
-        await navigator.serviceWorker.ready;
-
-        await OneSignal.init({
-          appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
-          allowLocalhostAsSecureOrigin: true,
-        });
-        console.log(session.user.id);
-        // Recién ahora hacer login
-        await OneSignal.login(session.user.id);
-      });
+        if (session?.user?.id) {
+          console.log("Sincronizando usuario con OneSignal:", session.user.id);
+          await os.login(session.user.id);
+        }
+      } catch (err) {
+        console.error("Error en OneSignal:", err);
+      }
     };
 
-    init();
-  }, []);
+    // Si OneSignal ya cargó, ejecutamos. Si no, esperamos al push.
+    if (window.OneSignal) {
+      runInit();
+    } else {
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      window.OneSignalDeferred.push(runInit);
+    }
+  };
+
+  if (session?.user?.id) {
+    setupOneSignal();
+  }
+}, [session?.user?.id]);
+
 
   useEffect(() => {
     const fetchProfile = async () => {
