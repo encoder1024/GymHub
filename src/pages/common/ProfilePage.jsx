@@ -13,12 +13,25 @@ const ProfilePage = () => {
   const [role, setRole] = useState(""); // El rol debe ser visible pero no editable por el usuario común
   const [phone, setPhone] = useState("");
 
-    useEffect(() => {
+  useEffect(() => {
     const init = async () => {
       // await OneSignal.init({
       //   appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
       //   allowLocalhostAsSecureOrigin: true,
       // });
+
+      // 👉 Inicializar OneSignal
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      window.OneSignalDeferred.push(async function (OneSignal) {
+        await OneSignal.init({
+          appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
+          // safari_web_id: "TU-SAFARI-WEB-ID", // obligatorio para iPhone
+          notifyButton: {
+            enable: true,
+          },
+          allowLocalhostAsSecureOrigin: true,
+        });
+      });
 
       const {
         data: { user },
@@ -190,7 +203,7 @@ const ProfilePage = () => {
             {isUpdating ? "Guardando..." : "Guardar Cambios"}
           </button>
         </form>
-        <p style={{color: "#bbb"}}>v:1.0.0</p>
+        <p style={{ color: "#bbb" }}>v:1.0.0</p>
       </div>
     </div>
   );

@@ -21,18 +21,18 @@ if ("serviceWorker" in navigator) {
     .catch((err) => console.error("Error registrando SW", err))
 }
 
-// 👉 Inicializar OneSignal
-window.OneSignalDeferred = window.OneSignalDeferred || []
-window.OneSignalDeferred.push(async function (OneSignal) {
-  await OneSignal.init({
-    appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
-    // safari_web_id: "TU-SAFARI-WEB-ID", // obligatorio para iPhone
-    notifyButton: {
-      enable: true,
-    },
-    allowLocalhostAsSecureOrigin: true,
-  })
-})
+// // 👉 Inicializar OneSignal
+// window.OneSignalDeferred = window.OneSignalDeferred || []
+// window.OneSignalDeferred.push(async function (OneSignal) {
+//   await OneSignal.init({
+//     appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
+//     // safari_web_id: "TU-SAFARI-WEB-ID", // obligatorio para iPhone
+//     notifyButton: {
+//       enable: true,
+//     },
+//     allowLocalhostAsSecureOrigin: true,
+//   })
+// })
 
 
 
