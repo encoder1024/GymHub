@@ -34,7 +34,7 @@ if (!classInfo || !gymInfo || !onBook){return;}
   const isReservable = new Date(classInfo.start_time) > new Date();
 
   return (
-    <div className="bg-withe shadow-1 br3 w-full sm:w-72 flex flex-column justify-between ma2">
+    <div className="bg-gray shadow-1 br3 w-full sm:w-72 flex flex-column justify-between ma2">
       <h3 className="ma1 pa1 f4 mv0 withe">{classInfo.name}</h3>
       <h4 className="ma1 pa1 f4 mv0">{resultGymName}</h4>
       <p className="ma1 f6 mt2">{classInfo.description}</p>

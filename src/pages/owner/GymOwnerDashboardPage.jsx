@@ -491,7 +491,7 @@ const GymOwnerDashboardPage = () => {
             gym.map((gymInter, i) => (
               <div
                 key={gymInter.id}
-                className="bg-white shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc flex flex-column justify-between"
+                className="bg-gray shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc flex flex-column justify-between"
               >
                 <GymCardDash
                   gymInfo={gymInter}
@@ -680,7 +680,7 @@ const GymOwnerDashboardPage = () => {
             classes.map((cls) => (
               <div
                 key={cls.id}
-                className="bg-white shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc flex flex-column justify-between"
+                className="bg-gray shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc flex flex-column justify-between"
               >
                 <ClassCard
                   classInfo={cls}

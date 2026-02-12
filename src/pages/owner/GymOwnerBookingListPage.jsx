@@ -177,12 +177,12 @@ const GymOwnerBookingListPage = () => {
           {bookings.map((booking) => (
             <div
               key={booking.id}
-              className="bg-white shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc"
+              className="bg-gray shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc"
             >
               <h3 className="f4 mv0">{booking.classes.name}</h3>
-              <p className="f6 lh-copy measure mid-gray">
+              <p className="f6 lh-copy measure">
                 Reservado por: {booking.profiles?.full_name || booking.user_id}{" "}
-                ({booking.profiles?.email || "email no disponible"})
+                {/* ({booking.profiles?.email || "email no disponible"}) */}
               </p>
               <p className="f6 mt2">
                 <strong>Hora:</strong>{" "}
