@@ -39,10 +39,7 @@ const ProfilePage = () => {
           appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
           allowLocalhostAsSecureOrigin: true,
         });
-
-        // Esperar a que el usuario esté listo
-        await OneSignal.User.PushSubscription.waitUntilSubscribed();
-
+        console.log(session.user.id);
         // Recién ahora hacer login
         await OneSignal.login(session.user.id);
       });
