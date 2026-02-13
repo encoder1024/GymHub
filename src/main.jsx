@@ -15,10 +15,14 @@ createRoot(document.getElementById("root")).render(
 
 // 👉 Registrar Service Worker (obligatorio para iPhone)
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker
-    .register("/sw.js")
-    .then(() => console.log("SW ok"))
-    .catch((err) => console.error("Error registrando SW", err))
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/sw.js", { scope: "/" }) // Forzamos el scope raíz
+      .then((reg) => {
+        console.log("SW registrado con éxito:", reg.scope);
+      })
+      .catch((err) => console.error("Error registrando SW", err));
+  });
 }
 
 // // 👉 Inicializar OneSignal
@@ -33,6 +37,3 @@ if ("serviceWorker" in navigator) {
 //     allowLocalhostAsSecureOrigin: true,
 //   })
 // })
-
-
-
