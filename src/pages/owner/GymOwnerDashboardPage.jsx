@@ -601,7 +601,7 @@ const GymOwnerDashboardPage = () => {
                 key={gymInter.id}
                 className="bg-gray shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc flex flex-column justify-between"
               >
-                {console.log("Clases de los gyms con formato: ", gym)}
+                {/* {console.log("Clases de los gyms con formato: ", gym)} */}
                 <GymCardDash
                   gymInfo={gymInter}
                   cantClases={gymsClasses[i]}
