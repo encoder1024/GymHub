@@ -36,7 +36,10 @@ const Navbar = () => {
         { to: "/owner/gym-owner-bookings", label: "Ver Reservas" },
         { to: "/admin/membership", label: "Membresías" },
       ],
-      cliente: [{ to: "user/my-bookings", label: "Mis Reservas" }],
+      cliente: [
+        { to: "user/my-bookings", label: "Mis Reservas" },
+        { to: "user/UserClassesSearch", label: "Clases" },
+      ],
     };
 
     return [...links, ...(roleSpecific[userRole] || [])];
@@ -80,9 +83,7 @@ const Navbar = () => {
       {/* Contenedor de Links */}
       <div
         className={`${
-          isOpen
-            ? "db gray pa3 mt3 br2 bt b--light-gray shadow-1"
-            : "dn"
+          isOpen ? "db gray pa3 mt3 br2 bt b--light-gray shadow-1" : "dn"
         } dtc-l v-mid w-100 w-75-l tr-l mt0-l pa0-l bg-white-l bn-l shadow-none-l`}
       >
         {/* Links Públicos */}

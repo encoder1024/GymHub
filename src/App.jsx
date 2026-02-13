@@ -18,6 +18,7 @@ import NotFoundPage from "./pages/common/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import BookCheckoutPage from "./pages/user/BookCheckoutPage";
 import AdminGymDetails from "./pages/admin/AdminGymDetails";
+import UserClassesSearch from "./pages/user/UserClassesSearch";
 
 function App() {
   return (
@@ -63,6 +64,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <BookCheckoutPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/UserClassesSearch"
+            element={
+              <ProtectedRoute>
+                <UserClassesSearch />
               </ProtectedRoute>
             }
           />
