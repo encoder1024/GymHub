@@ -228,7 +228,7 @@ const ProfilePage = () => {
             {isUpdating ? "Guardando..." : "Guardar Cambios"}
           </button>
         </form>
-        <p style={{ color: "#bbb" }}>v:1.0.0</p>
+        <p style={{ color: "#bbb" }}>v:1.0.1</p>
       </div>
     </div>
   );
