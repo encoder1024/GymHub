@@ -4,6 +4,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import "tachyons/css/tachyons.min.css";
 import "leaflet/dist/leaflet.css"; // Importar estilos de Leaflet
 import App from "./App.jsx";
+import { SpeedInsights } from "@vercel/speed-insights/react"
 
 createRoot(document.getElementById("root")).render(
   <AuthProvider>
