@@ -57,13 +57,25 @@ export default function MapTilerComponent({ gymsArray }) {
           </button>
         </div>
       `;
-      } else {
+      } else if (profile?.role === "cliente") {
         htmlContent = `
         <div style="text-align:center; background:gray;">
           <h3>${gym.title}</h3>
           <p>${gym.category_name}</p>
           <p>${gym.phone}</p>
           <button onclick="window.location.href='/user/my-bookings?name=${gym.title}&id=${gym.id}'" 
+                  style="background:#007bff; color:white; border:none; padding:5px 10px; cursor:pointer;">
+            Ver detalles / Reservar
+          </button>
+        </div>
+      `;
+      } else {
+        htmlContent = `
+        <div style="text-align:center; background:gray;">
+          <h3>${gym.title}</h3>
+          <p>${gym.category_name}</p>
+          <p>${gym.phone}</p>
+          <button onclick="window.location.href='/owner/gym-owner-dashboard?name=${gym.title}'" 
                   style="background:#007bff; color:white; border:none; padding:5px 10px; cursor:pointer;">
             Ver detalles / Reservar
           </button>

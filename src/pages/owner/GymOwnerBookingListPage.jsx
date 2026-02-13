@@ -27,7 +27,7 @@ const GymOwnerBookingListPage = () => {
           .eq("id", session.user.id)
           .single();
 
-        // console.log(session.user.id);
+        // console.log(session.user.id, profileData.role);
 
         if (profileError) throw profileError;
 
