@@ -64,7 +64,7 @@ const AdminMetricsDashboardPage = () => {
         // Fetch total active memberships count
         const { count: totalMemberships, error: membershipsError } =
           await supabase
-            .from("user_memberships")
+            .from("owner_memberships")
             .select("*", { count: "exact", head: true })
             .eq("status", "activa"); // Count only active memberships
         if (membershipsError) throw membershipsError;
