@@ -27,45 +27,48 @@ const ProfilePage = () => {
   // }, [session?.user?.id]);
 
   useEffect(() => {
-  const setupOneSignal = async () => {
-    // Definimos la función de inicialización
-    const runInit = async () => {
-      const os = window.OneSignal;
-      if (!os) return;
+    const setupOneSignal = async () => {
+      // Definimos la función de inicialización
+      const runInit = async () => {
+        const os = window.OneSignal;
+        if (!os) return;
 
-      try {
-        // Solo inicializar si no se hizo ya
-        if (!os.initialized) {
-          await os.init({
-            appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
-            allowLocalhostAsSecureOrigin: true,
-            serviceWorkerPath: "OneSignalSDKWorker.js",
-          });
-        }
+        try {
+          // Solo inicializar si no se hizo ya
+          if (!os.initialized) {
+            await os.init({
+              appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
+              allowLocalhostAsSecureOrigin: true,
+              serviceWorkerPath: "sw.js", // <-- ACÁ le decís que use TU archivo
+              serviceWorkerParam: { scope: "/" },
+            });
+          }
 
-        if (session?.user?.id) {
-          console.log("Sincronizando usuario con OneSignal:", session.user.id);
-          await os.login(session.user.id);
+          if (session?.user?.id) {
+            console.log(
+              "Sincronizando usuario con OneSignal:",
+              session.user.id,
+            );
+            await os.login(session.user.id);
+          }
+        } catch (err) {
+          console.error("Error en OneSignal:", err);
         }
-      } catch (err) {
-        console.error("Error en OneSignal:", err);
+      };
+
+      // Si OneSignal ya cargó, ejecutamos. Si no, esperamos al push.
+      if (window.OneSignal) {
+        runInit();
+      } else {
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        window.OneSignalDeferred.push(runInit);
       }
     };
 
-    // Si OneSignal ya cargó, ejecutamos. Si no, esperamos al push.
-    if (window.OneSignal) {
-      runInit();
-    } else {
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-      window.OneSignalDeferred.push(runInit);
+    if (session?.user?.id) {
+      setupOneSignal();
     }
-  };
-
-  if (session?.user?.id) {
-    setupOneSignal();
-  }
-}, [session?.user?.id]);
-
+  }, [session?.user?.id]);
 
   useEffect(() => {
     const fetchProfile = async () => {
