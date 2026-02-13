@@ -17,7 +17,7 @@ createRoot(document.getElementById("root")).render(
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/sw.js")
-    .then(() => console.log("SW registrado"))
+    .then(() => console.log("SW ok"))
     .catch((err) => console.error("Error registrando SW", err))
 }
 

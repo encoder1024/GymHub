@@ -91,15 +91,16 @@ const AdminGymApprovalPage = () => {
       {!loading && !error && pendingGyms.length > 0 && (
         <div className="flex flex-wrap justify-center">
           {pendingGyms.map((gym) => (
-            <div key={gym.id} className="bg-white shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc">
+            <div key={gym.id} className="bg-gray shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc">
               <h3 className="f4 mv0">{gym.name}</h3>
-              <p className="f6 lh-copy measure mid-gray mt2">{gym.description}</p>
-              <p className="f6 gray">Ubicación: {gym.location || 'No especificada'}</p>
+              <p className="f6 lh-copy measure mt2">{gym.description}</p>
+              <p className="f6">Ubicación: {gym.city || 'No especificada'}</p>
+              <p className="f6">Celu: {gym.phone}</p>
               <div className="mt3 flex justify-center gap-2">
-                <button onClick={() => handleApproveGym(gym.id)} className="bn ph3 pv2 input-reset ba b--green bg-green grow pointer f6 dib br2 white">
+                <button onClick={() => handleApproveGym(gym.id)} className="bn ph3 pv2 input-reset ba b--green bg-green grow pointer f6 dib br2 white ma2">
                   Aprobar
                 </button>
-                <button onClick={() => handleRejectGym(gym.id)} className="bn ph3 pv2 input-reset ba b--red bg-red grow pointer f6 dib br2 white">
+                <button onClick={() => handleRejectGym(gym.id)} className="bn ph3 pv2 input-reset ba b--red bg-red grow pointer f6 dib br2 white ma2">
                   Rechazar
                 </button>
               </div>

@@ -11,11 +11,11 @@ const GymCardDash = ({gymInfo, cantClases}) => { // Recibe gym
         <img src="https://placehold.co/600x400/000000/FFFFFF/png?text=Gym" className="db w-100 h-auto br2 br--top-l" alt="Foto de un gimnasio." />
       </div>
       
-      <div className="bg-white shadow-1 br3 w-100 w-100-m w-100-l flex flex-column justify-between">
+      <div className="bg-gray shadow-1 br3 w-100 w-100-m w-100-l flex flex-column justify-between">
         <div>
-          <h1 className="f4 f3-ns mv0">{gymInfo.name}</h1>
-          <p className="f6 lh-copy measure mt2 mid-gray">{gymInfo.description}</p>
-          <p className="f6 lh-copy measure mt2 mid-gray">Ubicación: {gymInfo.lng}, {gymInfo.lat}</p>
+          <h1 className="f4 f3-ns mv0">{gymInfo.title}</h1>
+          <p className="f6 lh-copy measure mt2">{gymInfo.category_name}</p>
+          <p className="f6 lh-copy measure mt2">Ubicación: {gymInfo.lat},{gymInfo.lng}</p>
           {/* Podría añadir la dirección si estuviera en gym.location */}
         </div>
         
