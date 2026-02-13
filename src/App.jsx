@@ -19,6 +19,10 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import BookCheckoutPage from "./pages/user/BookCheckoutPage";
 import AdminGymDetails from "./pages/admin/AdminGymDetails";
 import UserClassesSearch from "./pages/user/UserClassesSearch";
+import { SpeedInsights } from "@vercel/speed-insights/react"; 
+import MembershipPageSussesPay from "./pages/admin/MembershipPageSussesPay";
+import MembershipPageFailurePay from "./pages/admin/MembershipPageFailurePay";
+import MembershipPagePendingPay from "./pages/admin/MembershipPagePendingPay";
 
 function App() {
   return (
@@ -109,6 +113,30 @@ function App() {
               </ProtectedRoute>
             }
           />
+                    <Route
+            path="/admin/membershipSussesPay"
+            element={
+              <ProtectedRoute roles={["admin", "owner"]}>
+                <MembershipPageSussesPay />
+              </ProtectedRoute>
+            }
+          />
+                    <Route
+            path="/admin/membershipFailurePay"
+            element={
+              <ProtectedRoute roles={["admin", "owner"]}>
+                <MembershipPageFailurePay />
+              </ProtectedRoute>
+            }
+          />
+                    <Route
+            path="/admin/membershipPendingPay"
+            element={
+              <ProtectedRoute roles={["admin", "owner"]}>
+                <MembershipPagePendingPay />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/admin/AdminGymDetails"
             element={
@@ -148,6 +176,7 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
+      <SpeedInsights />
     </div>
   );
 }
