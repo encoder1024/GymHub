@@ -284,7 +284,7 @@ const MyBookingsPage = () => {
               ))}
             </div>
           ) : (
-            <p className="f6 mid-gray">
+            <p className="f6 withe">
               <strong>{gymNamefromMap}</strong> no tiene clases programadas actualmente.
             </p>
           )}

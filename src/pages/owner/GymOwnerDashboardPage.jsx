@@ -23,6 +23,10 @@ const GymOwnerDashboardPage = () => {
   const [endTime, setEndTime] = useState("");
   const [capacity, setCapacity] = useState("");
   const [gymSeleccionadoClassEdit, setGymSeleccionadoClassEdit] = useState(0);
+  const [formData, setFormData] = useState({
+    gymId: "",
+    gymName: "",
+  });
 
   const [isFormOpenGym, setIsFormOpenGym] = useState(false);
   const [currentGym, setCurrentGym] = useState(null); // Para editar una clase existente
@@ -31,6 +35,10 @@ const GymOwnerDashboardPage = () => {
   const [locationGymLat, setLocationGymLat] = useState("");
   const [locationGymLng, setLocationGymLng] = useState("");
   const [locationGym, setLocationGym] = useState("");
+  const [direStreet, setDireStreet] = useState("");
+  const [direCity, setDireCity] = useState("");
+  const [direState, setDireState] = useState("");
+  const [direPhone, setDirePhone] = useState("");
 
   // Creamos la referencia
   const miReferencia = useRef(null); // al formulario de gym para hacer el scroll suave
@@ -114,7 +122,10 @@ const GymOwnerDashboardPage = () => {
         //   .single();
 
         const { data: gymData, error: gymError } = await supabase.rpc(
-          "get_gyms_with_coords",
+          "get_gyms_by_owner_santa_fe",
+          {
+            owner_id_input: session.user.id,
+          },
         );
 
         if (gymError) throw gymError;
@@ -127,15 +138,16 @@ const GymOwnerDashboardPage = () => {
 
         // 3. Fetch classes for this gym
         const { data: classesData, error: classesError } = await supabase
-          .from("classes")
+          .from("classes_santa_fe")
           .select("*")
           .eq("gym_id", gymData[0].id)
-          .order("start_time", { ascending: true });
+          .order("start_time", { ascending: false });
 
         if (classesError) throw classesError;
         setClasses(classesData);
 
         const { data, error } = await supabase.rpc("get_gym_classes_count");
+        // console.log("Clases de los gyms: ", data);
 
         if (error) {
           console.error("Error:", error.message);
@@ -145,8 +157,12 @@ const GymOwnerDashboardPage = () => {
           //   data,
           // );
           setGymsClasses(
-            Object.entries(data).map(([id, count]) => ({ id, count })),
+            Object.entries(data).map(([id, count]) => ({
+              id: Number(id), // Convertimos la llave (string) a número
+              count: count,
+            })),
           );
+          // console.log("Clases de los gyms con formato: ", gymsClasses);
         }
       } catch (error) {
         setError(error.message);
@@ -186,16 +202,22 @@ const GymOwnerDashboardPage = () => {
     setDescriptionGym("");
     setLocationGym("");
     setIsFormOpenGym(true);
+    setDireStreet("");
+    setDireCity("");
+    setDireState("");
   };
 
   const openFormForEditGym = (gym) => {
     setCurrentGym(gym);
-    setNameGym(gym.name);
+    setNameGym(gym.title); //NOW REVISAR
     setDescriptionGym(gym.description || "");
     setLocationGym(gym.position);
     setLocationGymLat(gym.lng);
     setLocationGymLng(gym.lat);
     setIsFormOpenGym(true);
+    setDireStreet(gym.street);
+    setDireCity(gym.city);
+    setDireState(gym.state);
   };
 
   const handleClassSubmit = async (e) => {
@@ -208,7 +230,7 @@ const GymOwnerDashboardPage = () => {
     // console.log("El gym elegido al crear la clase:", formData);
 
     const classData = {
-      gym_id: formData.gymId,
+      gym_id: currentClass? currentClass.gym_id : formData.gymId,
       name: className,
       description: classDescription,
       start_time: new Date(startTime).toISOString(),
@@ -216,19 +238,23 @@ const GymOwnerDashboardPage = () => {
       capacity: parseInt(capacity, 10),
     };
 
+    // console.log("La info antes de actualziar o crear una clase: ", classData, currentClass? currentClass.gym_id : formData.gymId);
+
     try {
       let result = null;
       if (currentClass) {
         // Update existing class
         const { error } = await supabase
-          .from("classes")
+          .from("classes_santa_fe")
           .update(classData)
           .eq("id", currentClass.id);
         if (error) throw error;
         result = "Clase actualizada correctamente!";
       } else {
         // Create new class
-        const { error } = await supabase.from("classes").insert([classData]);
+        const { error } = await supabase
+          .from("classes_santa_fe")
+          .insert([classData]);
         if (error) throw error;
         result = "Clase creada correctamente!";
       }
@@ -236,10 +262,10 @@ const GymOwnerDashboardPage = () => {
       setIsFormOpen(false);
       // Refetch classes after submit
       const { data: updatedClasses, error: fetchError } = await supabase
-        .from("classes")
+        .from("classes_santa_fe")
         .select("*")
         .eq("gym_id", formData.gymId) // TODO: ver cuando tenga varios gym un owner y esto se haga dinámico.
-        .order("start_time", { ascending: true });
+        .order("start_time", { ascending: false });
       if (!fetchError) setClasses(updatedClasses);
 
       const { data, error } = await supabase.rpc("get_gym_classes_count");
@@ -273,13 +299,36 @@ const GymOwnerDashboardPage = () => {
     // const lng = -58.3816;
 
     // IMPORTANTE: El orden es Longitud primero, luego Latitud
-    const pointWKT = `POINT(${locationGymLat} ${locationGymLng})`;
+    const pointWKT = `POINT(${locationGymLng} ${locationGymLat})`;
 
-    const gymData = {
+    const sinEspacios = direPhone.replace(/\s+/g, "");
+    // 2. La regex valida: +54 + (opcional 9) + (área) + (número)
+    // Total de dígitos después del +54 debe ser 10 u 11
+    const phoneRegex = /^\+549?\d{10}$/;
+
+    if (!phoneRegex.test(sinEspacios)) {
+      setError("El formato del teléfono no es válido. Ej: +54 341 4810169");
+      setLoading(false);
+      return;
+    }
+
+    const gymDataInsertGymsTable = {
       owner_id: session.user.id,
       name: nameGym,
       description: descriptionGym,
       location_coords: pointWKT,
+      phone: direPhone,
+    };
+
+    const gymDataUpdateSantaFe = {
+      owner_id: session.user.id,
+      title: nameGym,
+      category_name: descriptionGym,
+      location: pointWKT,
+      street: direStreet,
+      city: direCity,
+      state: direState,
+      phone: direPhone,
     };
 
     // console.log("en el submit del form debería ser null:", currentGym);
@@ -289,14 +338,16 @@ const GymOwnerDashboardPage = () => {
         //FOLLOW TOMORROW: ya tenemos un gym
         // Update existing class
         const { error } = await supabase
-          .from("gyms")
-          .update(gymData)
+          .from("gymsSantaFe")
+          .update(gymDataUpdateSantaFe)
           .eq("id", currentGym.id);
         if (error) throw error;
         result = "Gym actualizado correctamente!";
       } else {
         // Create new class
-        const { error } = await supabase.from("gyms").insert([gymData]);
+        const { error } = await supabase
+          .from("gyms")
+          .insert([gymDataInsertGymsTable]);
         if (error) throw error;
         result = "Gym creado correctamente!";
       }
@@ -305,7 +356,10 @@ const GymOwnerDashboardPage = () => {
       // Refetch classes after submit
       // console.log(session.user.id)
       const { data: updatedGyms, error: fetchError } = await supabase.rpc(
-        "get_gyms_with_coords",
+        "get_gyms_by_owner_santa_fe",
+        {
+          owner_id_input: session.user.id,
+        },
       );
 
       if (!fetchError) setGym(updatedGyms);
@@ -318,7 +372,7 @@ const GymOwnerDashboardPage = () => {
 
   const handleDeleteClass = async (classId) => {
     try {
-      const { error, elemId } = await CrudDelete(classId, "classes");
+      const { error, elemId } = await CrudDelete(classId, "classes_santa_fe");
 
       if (error) throw error;
 
@@ -330,9 +384,9 @@ const GymOwnerDashboardPage = () => {
 
   const handleDeleteGym = async (gymId) => {
     try {
-      const { error, elemId, updatedElement } = await CrudUpdate(
+      const { error, elemId } = await CrudUpdate(
         gymId,
-        "gyms",
+        "gymsSantaFe",
         { is_deleted: true },
         "¿Estás seguro de que quieres borrar este gimnasio?",
       );
@@ -345,11 +399,6 @@ const GymOwnerDashboardPage = () => {
       console.log(`Error al eliminar gimnasio: ${error.message}`);
     }
   };
-
-  const [formData, setFormData] = useState({
-    gymId: "",
-    gymName: "",
-  });
 
   const handleGymChange = (e) => {
     // const selectedId = e.target.value;
@@ -379,10 +428,10 @@ const GymOwnerDashboardPage = () => {
     // console.log("el id del Gym elegido para mostrar clases:", selectedId, gym);
 
     const { data: updatedClasses, error: fetchError } = await supabase
-      .from("classes")
+      .from("classes_santa_fe")
       .select("*")
       .eq("gym_id", selectedId)
-      .order("start_time", { ascending: true });
+      .order("start_time", { ascending: false });
 
     if (!fetchError) setClasses(updatedClasses);
   };
@@ -401,7 +450,7 @@ const GymOwnerDashboardPage = () => {
           </button>
         </h2>
         {isFormOpenGym && (
-          <div className="measure center pa4 bg-light-gray shadow-1 br2 mb4">
+          <div className="measure center pa4 bg-gray shadow-1 br2 mb4">
             <h3 className="f4 mb3">
               {currentGym ? "Editar Gym" : "Nuevo Gym"}
             </h3>
@@ -433,6 +482,25 @@ const GymOwnerDashboardPage = () => {
                   onChange={(e) => setDescriptionGym(e.target.value)}
                 />
               </div>
+              <div className="mt3">
+                <label className="db fw6 lh-copy f6" htmlFor="dire-phone">
+                  Teléfono
+                </label>
+                <input
+                  className={
+                    error
+                      ? "border-red-500 pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
+                      : "pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
+                  }
+                  type="tel"
+                  name="phone"
+                  id="phone"
+                  value={direPhone}
+                  onChange={(e) => setDirePhone(e.target.value)}
+                  placeholder="+54 341 4810169"
+                  required
+                />
+              </div>
               <div className="mv2 flex justify-between">
                 <div>
                   <label className="db fw6 lh-copy f6" htmlFor="start-time">
@@ -458,6 +526,46 @@ const GymOwnerDashboardPage = () => {
                   />
                 </div>
               </div>
+              <div className="mv2">
+                <label className="db fw6 lh-copy f6" htmlFor="dire-street">
+                  Dirección: Calle y número
+                </label>
+                <input
+                  className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
+                  type="text"
+                  id="dire-street"
+                  value={direStreet}
+                  onChange={(e) => setDireStreet(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mv2">
+                <label className="db fw6 lh-copy f6" htmlFor="dire-city">
+                  Dirección: Ciudad
+                </label>
+                <input
+                  className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
+                  type="text"
+                  id="dire-city"
+                  value={direCity}
+                  onChange={(e) => setDireCity(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mv2">
+                <label className="db fw6 lh-copy f6" htmlFor="dire-state">
+                  Dirección: Provincia
+                </label>
+                <input
+                  className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
+                  type="text"
+                  id="dire-state"
+                  value={direState}
+                  onChange={(e) => setDireState(e.target.value)}
+                  required
+                />
+              </div>
+
               {error && <p className="f6 red">{error}</p>}
               <button
                 type="submit"
@@ -491,8 +599,9 @@ const GymOwnerDashboardPage = () => {
             gym.map((gymInter, i) => (
               <div
                 key={gymInter.id}
-                className="bg-white shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc flex flex-column justify-between"
+                className="bg-gray shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc flex flex-column justify-between"
               >
+                {/* {console.log("Clases de los gyms con formato: ", gym)} */}
                 <GymCardDash
                   gymInfo={gymInter}
                   cantClases={gymsClasses[i]}
@@ -537,13 +646,13 @@ const GymOwnerDashboardPage = () => {
           {/* <option value="">Seleccioná uno...</option> */}
           {gym.map((gym) => (
             <option key={gym.id} value={gym.id}>
-              {gym.name}
+              {gym.title}
             </option>
           ))}
         </select>
 
         {isFormOpen && (
-          <div className="measure center pa4 bg-light-gray shadow-1 br2 mb4">
+          <div className="measure center pa4 bg-gray shadow-1 br2 mb4">
             <h3 className="f4 mb3">
               {currentClass ? "Editar Clase" : "Nueva Clase"}
             </h3>
@@ -575,21 +684,10 @@ const GymOwnerDashboardPage = () => {
                   <option value="">Seleccioná uno...</option>
                   {gym.map((gym) => (
                     <option key={gym.id} value={gym.id}>
-                      {gym.name}
+                      {gym.title}
                     </option>
                   ))}
                 </select>
-
-                {/* <select
-                  value={seleccionado}
-                  onChange={(e) => setSeleccionado(e.target.value)}
-                >
-                  {opciones.map((opcion) => (
-                    <option key={opcion} value={opcion}>
-                      {opcion}
-                    </option>
-                  ))}
-                </select> */}
               </div>
               <div className="mv2">
                 <label
@@ -680,7 +778,7 @@ const GymOwnerDashboardPage = () => {
             classes.map((cls) => (
               <div
                 key={cls.id}
-                className="bg-white shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc flex flex-column justify-between"
+                className="bg-gray shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc flex flex-column justify-between"
               >
                 <ClassCard
                   classInfo={cls}
@@ -688,9 +786,10 @@ const GymOwnerDashboardPage = () => {
                   // Dummy onBook for ahora, actual logic will be handled later or if class is booked from gym page
                   onBook={() =>
                     alert(
-                      "Reserva simulada. Iría a una página de confirmación o lógica de pago.",
+                      "El cartel solo confirma que está disponible para reservar para los clientes.",
                     )
                   }
+                  tabla="SantaFe"
                 />
                 <div className="mt3 flex justify-center gap-2">
                   <button
