@@ -34,14 +34,16 @@ const RegisterPage = () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (phoneRegex.test(sinEspacios) && emailRegex.test(email)) {
-
       const redirectBase = window.location.origin;
       const redirectTo = `${redirectBase}/login`;
 
       try {
-        const { data: existing, error: profileError } = await supabase.rpc("email_exists", {
-          p_email: email,
-        });
+        const { data: existing, error: profileError } = await supabase.rpc(
+          "email_exists",
+          {
+            p_email: email,
+          },
+        );
 
         if (profileError) {
           setError("Hubo un problema verificando el email. Intentá de nuevo.");
@@ -54,6 +56,8 @@ const RegisterPage = () => {
           setSuccess(false);
         } else {
           // 1. Registrar el usuario en Supabase Auth
+          const role = fullName.includes("+") ? fullName.split("+")[1] : "cliente";
+
           const { data, error } = await supabase.auth.signUp({
             email,
             password,
@@ -63,7 +67,7 @@ const RegisterPage = () => {
                 full_name: fullName,
                 email: email,
                 phone: sinEspacios,
-                // El rol se establecerá por defecto como 'cliente' en la tabla profiles
+                role: role, // El rol se establecerá por defecto como 'cliente' en la tabla profiles
               },
             },
           });
@@ -105,7 +109,8 @@ const RegisterPage = () => {
           <p className="text-gray-500 mb-8">
             Hemos enviado un enlace de confirmación a <strong>{email}</strong>.
             <br />
-            Por favor revisa tu bandeja de entrada y <strong>la carpeta de spam</strong>.
+            Por favor revisa tu bandeja de entrada y{" "}
+            <strong>la carpeta de spam</strong>.
           </p>
           <Link
             to="/login"
