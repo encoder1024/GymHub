@@ -47,7 +47,7 @@ const MpSussesPayment = () => {
   }, [orderId]);
 
   return (
-    <div className="min-vh-100 bg-near-white flex flex-column items-center justify-center ph3">
+    <div className="min-vh-100 bg-gray flex flex-column items-center justify-center ph3">
       <div className="bg-white mw6 w-100 pa4 pa5-ns br3 shadow-5 tc">
         <CheckCircle size={64} className="green mb3" />
         <h1 className="f2 dark-gray mb2">¡Pago Confirmado!</h1>
