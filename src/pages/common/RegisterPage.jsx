@@ -105,7 +105,7 @@ const RegisterPage = () => {
           <p className="text-gray-500 mb-8">
             Hemos enviado un enlace de confirmación a <strong>{email}</strong>.
             <br />
-            Por favor revisa tu bandeja de entrada.
+            Por favor revisa tu bandeja de entrada y <strong>la carpeta de spam</strong>.
           </p>
           <Link
             to="/login"

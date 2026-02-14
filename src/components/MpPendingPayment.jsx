@@ -15,7 +15,7 @@ export const MpPendingPayment = () => (
         </div>
       </div>
 
-      <Link to="/owner/dashboard" className="bg-gold white pv3 ph4 br2 b bn dim ttu tracked f6 dib w-100 no-underline">
+      <Link to="/owner/gym-owner-dashboard" className="bg-gold white pv3 ph4 br2 b bn dim ttu tracked f6 dib w-100 no-underline">
         Entendido, volver al inicio
       </Link>
     </div>

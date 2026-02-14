@@ -52,7 +52,7 @@ const MpSussesPayment = () => {
         <CheckCircle size={64} className="green mb3" />
         <h1 className="f2 dark-gray mb2">¡Pago Confirmado!</h1>
         <p className="f5 gray mb4">
-          Bienvenido a GymHub, {orderData?.profiles?.full_name || "Socio"}.
+          Bienvenid@s a GymHub, {orderData?.profiles?.full_name || "Socio!!!"}.
         </p>
 
         <div className="ba b--light-gray br3 pa3 mb4 bg-near-white tl">
@@ -78,7 +78,7 @@ const MpSussesPayment = () => {
         </div>
 
         <Link
-          to="/owner/dashboard"
+          to="/owner/gym-owner-dashboard"
           className="bg-green white pv3 ph4 br2 b bn dim ttu tracked f6 dib w-100 no-underline mb3"
         >
           Ir a mi Dashboard <ArrowRight size={16} className="ml2" />
