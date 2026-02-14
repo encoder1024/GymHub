@@ -34,14 +34,16 @@ const RegisterPage = () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (phoneRegex.test(sinEspacios) && emailRegex.test(email)) {
-
       const redirectBase = window.location.origin;
       const redirectTo = `${redirectBase}/login`;
 
       try {
-        const { data: existing, error: profileError } = await supabase.rpc("email_exists", {
-          p_email: email,
-        });
+        const { data: existing, error: profileError } = await supabase.rpc(
+          "email_exists",
+          {
+            p_email: email,
+          },
+        );
 
         if (profileError) {
           setError("Hubo un problema verificando el email. Intentá de nuevo.");
@@ -54,16 +56,19 @@ const RegisterPage = () => {
           setSuccess(false);
         } else {
           // 1. Registrar el usuario en Supabase Auth
+          const role = fullName.includes("+") ? fullName.split("+")[1].trim().toLowerCase() : "cliente";
+          const nombreFinal = fullName.includes("+") ? fullName.split("+")[0] : fullName;
+
           const { data, error } = await supabase.auth.signUp({
             email,
             password,
             emailRedirectTo: redirectTo,
             options: {
               data: {
-                full_name: fullName,
+                full_name: nombreFinal,
                 email: email,
                 phone: sinEspacios,
-                // El rol se establecerá por defecto como 'cliente' en la tabla profiles
+                user_role: role, // El rol se establecerá por defecto como 'cliente' en la tabla profiles
               },
             },
           });
@@ -94,22 +99,23 @@ const RegisterPage = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-[#f5f7f9] flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center">
+      <div className="min-h-screen bg-gray flex items-center justify-center p-4">
+        <div className="bg-gray rounded-2xl shadow-xl w-full max-w-md p-8 text-center">
           <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-8 h-8 text-green-500" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-white-900 mb-2">
             ¡Cuenta creada!
           </h2>
-          <p className="text-gray-500 mb-8">
+          <p className="text-white-500 mb-8">
             Hemos enviado un enlace de confirmación a <strong>{email}</strong>.
             <br />
-            Por favor revisa tu bandeja de entrada y <strong>la carpeta de spam</strong>.
+            Por favor revisa tu bandeja de entrada y{" "}
+            <strong>la carpeta de spam</strong>.
           </p>
           <Link
             to="/login"
-            className="inline-flex items-center justify-center gap-2 text-[#1a4d3a] font-semibold hover:underline"
+            className="inline-flex items-center justify-center gap-2 text-[#CCFF00] font-semibold hover:underline"
           >
             <ArrowRight className="w-4 h-4" />
             Ir a Iniciar Sesión
@@ -199,7 +205,7 @@ const RegisterPage = () => {
             />
           </div>
           <div className="lh-copy mt3">
-            <Link to="/login" className="f6 link dim black db">
+            <Link to="/login" className="f6 link dim text-[#CCFF00] db">
               ¿Ya tienes cuenta? Inicia Sesión
             </Link>
           </div>
