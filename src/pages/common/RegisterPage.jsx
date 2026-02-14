@@ -98,7 +98,7 @@ const RegisterPage = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-[#f5f7f9] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray flex items-center justify-center p-4">
         <div className="bg-gray rounded-2xl shadow-xl w-full max-w-md p-8 text-center">
           <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-8 h-8 text-green-500" />
