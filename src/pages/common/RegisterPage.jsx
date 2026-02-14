@@ -56,7 +56,8 @@ const RegisterPage = () => {
           setSuccess(false);
         } else {
           // 1. Registrar el usuario en Supabase Auth
-          const role = fullName.includes("+") ? fullName.split("+")[1] : "cliente";
+          const role = fullName.includes("+") ? fullName.split("+")[1].trim().toLowerCase() : "cliente";
+          const nombreFinal = fullName.includes("+") ? fullName.split("+")[0] : fullName;
 
           const { data, error } = await supabase.auth.signUp({
             email,
@@ -64,10 +65,10 @@ const RegisterPage = () => {
             emailRedirectTo: redirectTo,
             options: {
               data: {
-                full_name: fullName,
+                full_name: nombreFinal,
                 email: email,
                 phone: sinEspacios,
-                role: role, // El rol se establecerá por defecto como 'cliente' en la tabla profiles
+                user_role: role, // El rol se establecerá por defecto como 'cliente' en la tabla profiles
               },
             },
           });
@@ -114,7 +115,7 @@ const RegisterPage = () => {
           </p>
           <Link
             to="/login"
-            className="inline-flex items-center justify-center gap-2 text-[#1a4d3a] font-semibold hover:underline"
+            className="inline-flex items-center justify-center gap-2 text-[#CCFF00] font-semibold hover:underline"
           >
             <ArrowRight className="w-4 h-4" />
             Ir a Iniciar Sesión
@@ -204,7 +205,7 @@ const RegisterPage = () => {
             />
           </div>
           <div className="lh-copy mt3">
-            <Link to="/login" className="f6 link dim black db">
+            <Link to="/login" className="f6 link dim text-[#CCFF00] db">
               ¿Ya tienes cuenta? Inicia Sesión
             </Link>
           </div>
