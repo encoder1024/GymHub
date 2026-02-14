@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { CheckCircle, ArrowRight, Download } from "lucide-react";
 import { supabase } from "../supabaseClient";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const MpSussesPayment = () => {
   const [searchParams] = useSearchParams();
   const [orderData, setOrderData] = useState(null);
   const orderId = searchParams.get("external_reference");
-  const navigate = new Navigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchOrder() {
