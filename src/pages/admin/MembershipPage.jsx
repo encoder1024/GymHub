@@ -131,7 +131,7 @@ const MembershipPage = () => {
             className="bg-gray shadow-1 br3 pa4 ma3 measure w-100 w-40-m w-30-l tc flex flex-column justify-between"
           >
             <div>
-              <h2 className="f3 mb2">{plan.name}</h2>
+              <h2 className="f3 mb2 text-[#CCFF00]">{plan.name}</h2>
               <p className="f1 mv3">${plan.price.toLocaleString("es-AR")}</p>
               <p className="f5 lh-copy mb4">{plan.description}</p>
             </div>

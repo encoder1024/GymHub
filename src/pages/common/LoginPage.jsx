@@ -80,7 +80,7 @@ const LoginPage = () => {
             />
           </div>
           <div className="lh-copy mt3">
-            <Link to="/register" className="f3 link dim green db">
+            <Link to="/register" className="f3 link dim text-[#CCFF00] db">
               ¿No tienes cuenta? Regístrate
             </Link>
           </div>
