@@ -129,7 +129,7 @@ const GymOwnerDashboardPage = () => {
         );
 
         if (gymError) throw gymError;
-        if (!gymData) {
+        if (gymData.length < 1) {
           setError("No se encontró un gimnasio asociado a tu cuenta.");
           setLoading(false);
           return;

@@ -76,7 +76,7 @@ const GymOwnerBookingListPage = () => {
             .eq("is_approved", true);
 
           if (gymError) throw gymError;
-          if (!gymData) {
+          if (gymData.length < 1) {
             setError("No se encontró un gimnasio asociado a tu cuenta.");
             setLoading(false);
             return;
@@ -84,7 +84,7 @@ const GymOwnerBookingListPage = () => {
           setGym(gymData);
 
           // 3. Fetch bookings for classes belonging to this gym
-
+          console.log(gymData);
           const { data: bookingsData, error: bookingsError } =
             await supabase.rpc("get_confirmed_gym_bookings_santa_fe", {
               target_gym_id: gymData[0].id,

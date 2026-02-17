@@ -36,8 +36,8 @@ CREATE TABLE IF NOT EXISTS payments (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
   mp_payment_id TEXT UNIQUE,                  -- ID de transacción de MP
-  amount DECIMAL(12,2) NOT NULL,
-  status TEXT,                                -- approved, rejected, in_process
+  amount DECIMAL(19,4) NOT NULL,
+  statuss TEXT,                                -- approved, rejected, in_process
   payment_type TEXT DEFAULT 'online',         -- 'online' o 'point' (Postnet)
   payment_method_id TEXT,                     -- visa, master, mercadopago, etc.
   device_id TEXT,                             -- ID del Point físico si aplica
