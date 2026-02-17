@@ -209,7 +209,7 @@ const GymOwnerDashboardPage = () => {
 
   const openFormForEditGym = (gym) => {
     setCurrentGym(gym);
-    setNameGym(gym.title); //NOW REVISAR
+    setNameGym(gym.title);
     setDescriptionGym(gym.description || "");
     setLocationGym(gym.position);
     setLocationGymLat(gym.lng);
@@ -404,7 +404,7 @@ const GymOwnerDashboardPage = () => {
     // const selectedId = e.target.value;
     const selectedId = parseInt(e.target.value, 10);
     // console.log("el id del Gym elegido es:", selectedId, gym);
-    setGymSeleccionadoClassEdit(e.target.value); //NOW
+    setGymSeleccionadoClassEdit(e.target.value);
     // 1. Buscamos el objeto completo en nuestro array original usando el ID
     const gymData = gym.find((gym) => gym.id === selectedId);
 
@@ -604,7 +604,7 @@ const GymOwnerDashboardPage = () => {
                 {/* {console.log("Clases de los gyms con formato: ", gym)} */}
                 <GymCardDash
                   gymInfo={gymInter}
-                  cantClases={gymsClasses[i]}
+                  cantClases={gymsClasses[i].id == gymInter.id? gymsClasses[i] : {"id": gymInter.id , "count": "0"}}
                   // Dummy onBook for ahora, actual logic will be handled later or if class is booked from gym page
                 />
                 <div className="mt3 flex justify-center gap-2">
@@ -676,7 +676,7 @@ const GymOwnerDashboardPage = () => {
                 </label>
                 <select
                   name="gymId" // Importante para identificar el campo
-                  value={gymSeleccionadoClassEdit} //NOW
+                  value={gymSeleccionadoClassEdit}
                   onChange={handleGymChange}
                   required
                   className="w-full p-2 border border-gray-300 rounded"
