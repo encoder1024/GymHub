@@ -67,6 +67,58 @@ const GymsPage = () => {
       setLoading(true);
       setError(null);
 
+      async function solicitarPermisoUbicacion() {
+        // 1. Verificar si el navegador soporta la API de Permisos
+        if (!navigator.permissions) {
+          console.warn("La Permissions API no es soportada.");
+          return;
+        }
+
+        try {
+          const status = await navigator.permissions.query({
+            name: "geolocation",
+          });
+
+          if (status.state === "granted") {
+            console.log("Permiso ya concedido.");
+            iniciarGeolocalizacion(); // Tu función de getCurrentPosition
+          } else if (status.state === "prompt") {
+            console.log("El usuario verá el cuadro de diálogo oficial.");
+            iniciarGeolocalizacion();
+          } else if (status.state === "denied") {
+            // Caso crítico en Android: el usuario bloqueó el permiso anteriormente
+            alert(
+              "Para mostrar los gimnasios cercanos, por favor habilita la ubicación en la configuración de tu navegador/sitio.",
+            );
+          }
+
+          // Escuchar cambios en tiempo real (por si el usuario cambia el permiso en ajustes)
+          status.onchange = () => {
+            console.log("El estado del permiso cambió a: ", status.state);
+          };
+        } catch (error) {
+          console.error("Error al consultar permisos:", error);
+          // Como fallback, intentamos pedir la ubicación directamente
+          iniciarGeolocalizacion();
+        }
+      }
+
+      function iniciarGeolocalizacion() {
+        const options = {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        };
+
+        navigator.geolocation.getCurrentPosition(
+          (pos) => console.log("Ubicación obtenida:", pos.coords),
+          (err) => console.warn(`Error (${err.code}): ${err.message}`),
+          options,
+        );
+      }
+
+      solicitarPermisoUbicacion();
+      
       // cargaDBSantaFe();
       //mostrarGymsSantaFe();
 
