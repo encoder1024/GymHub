@@ -504,7 +504,7 @@ const GymOwnerDashboardPage = () => {
               <div className="mv2 flex justify-between">
                 <div>
                   <label className="db fw6 lh-copy f6" htmlFor="start-time">
-                    Ubicación (Latitud, Longitud)
+                    Ubicación coordenadas: (Opcional)
                   </label>
                   <input
                     className="pa2 input-reset ba bg-transparent hover-bg-black hover-white"
@@ -513,7 +513,6 @@ const GymOwnerDashboardPage = () => {
                     value={locationGymLat}
                     placeholder="Latitud"
                     onChange={(e) => setLocationGymLat(e.target.value)}
-                    required
                   />
                   <input
                     className="pa2 input-reset ba bg-transparent hover-bg-black hover-white"
@@ -522,7 +521,6 @@ const GymOwnerDashboardPage = () => {
                     placeholder="Longitud"
                     value={locationGymLng}
                     onChange={(e) => setLocationGymLng(e.target.value)}
-                    required
                   />
                 </div>
               </div>
