@@ -115,7 +115,7 @@ const RegisterPage = () => {
           </p>
           <Link
             to="/login"
-            className="inline-flex items-center justify-center gap-2 text-[#CCFF00] font-semibold hover:underline"
+            className="inline-flex items-center justify-center gap-2 btn-hamburguesa font-semibold hover:underline"
           >
             <ArrowRight className="w-4 h-4" />
             Ir a Iniciar Sesión

@@ -84,7 +84,7 @@ const Navbar = () => {
       <div
         className={`${
           isOpen ? "db gray pa3 mt3 br2 bt b--light-gray shadow-1" : "dn"
-        } dtc-l v-mid w-100 w-75-l tr-l mt0-l pa0-l bg-white-l bn-l shadow-none-l`}
+        } tr dtc-l v-mid w-100 w-75-l tr-l mt0-l pa0-l bg-white-l bn-l shadow-none-l`}
       >
         {/* Links Públicos */}
         <Link
@@ -126,14 +126,14 @@ const Navbar = () => {
                 ))}
                 <button
                   onClick={handleLogout}
-                  className="link dim red f6 f5-l db dib-l pointer bg-transparent bn pa0 tl tr-l fw6"
+                  className="link dim red f6 f5-l db dib-l pointer bg-transparent bn pa0 tr tr-l fw6"
                 >
                   Cerrar Sesión
                 </button>
               </>
             ) : (
               <Link
-                className="link dim blue f6 f5-l db dib-l fw6"
+                className="link dim btn-hamburguesa f6 f5-l db dib-l fw6"
                 to="/login"
                 onClick={() => setIsOpen(false)}
               >
