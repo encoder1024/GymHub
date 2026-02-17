@@ -15,7 +15,7 @@ const GymCardDash = ({gymInfo, cantClases}) => { // Recibe gym
         <div>
           <h1 className="f4 f3-ns mv0">{gymInfo.title}</h1>
           <p className="f6 lh-copy measure mt2">{gymInfo.category_name}</p>
-          <p className="f6 lh-copy measure mt2">Ubicación: {gymInfo.lat},{gymInfo.lng}</p>
+          <p className="f6 lh-copy measure mt2">Ubicación: {gymInfo.street}, {gymInfo.city}</p>
           {/* Podría añadir la dirección si estuviera en gym.location */}
         </div>
         
