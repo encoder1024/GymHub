@@ -192,7 +192,7 @@ export default function MapTilerComponent({ gymsArray }) {
         return container;
       };
 
-      const markerElement = createCustomMarker(Math.floor(Math.random() * 5) * 0); 
+      const markerElement = createCustomMarker(Math.floor(Math.random() * 5) * 0); // + 0 para ver los badges aleatorios a modo de muestra
 
       new maptilersdk.Marker({ element: markerElement }) //new maptilersdk.Marker({ color: "#0000FF" }) // Puedes personalizar el color
         .setLngLat([gym.longitud, gym.latitud])
