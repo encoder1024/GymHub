@@ -38,3 +38,29 @@ div, form, button, p, a, input {
   }
 }
 
+/*Son para el badge que muesrta la cantidad de clases disponibles en un cada gym en el mapa*/
+
+.custom-marker {
+  position: relative;
+  font-size: 24px; /* Tamaño del icono */
+  cursor: pointer;
+}
+
+.marker-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff4757; /* Rojo llamativo */
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
