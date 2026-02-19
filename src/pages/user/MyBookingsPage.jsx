@@ -87,10 +87,11 @@ const MyBookingsPage = () => {
             id,
             status,
             created_at,
-            classes_santa_fe (id, name, start_time, end_time, capacity, gymsSantaFe (title))
+            classes_santa_fe!inner (id, name, start_time, end_time, capacity, gymsSantaFe (title))
           `,
           )
           .eq("user_id", session.user.id)
+          .gte("classes_santa_fe.start_time", new Date().toISOString())
           .order("created_at", { ascending: false }); // Mostrar las más recientes primero
 
         if (error) throw error;
@@ -183,6 +184,11 @@ const MyBookingsPage = () => {
 
   const handleReservas = (reservClass, reservGym) => {
     const planoGym = reservGym && reservGym[0];
+
+    if (reservClass.capacity < 1) { 
+      alert("No puedes reservar en una clase que ya no tiene cupo disponible.");
+      return;
+    }
 
     // console.log(
     //   "llegué a la función que carga la reserva... y los parametros?",
