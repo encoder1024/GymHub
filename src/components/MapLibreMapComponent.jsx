@@ -179,7 +179,22 @@ export default function MapTilerComponent({ gymsArray }) {
       // Creamos el popup y lo vinculamos al marcador
       // const popup = new maptilersdk.Popup({ offset: 25 }).setHTML(htmlContent);
 
-      new maptilersdk.Marker({ color: "#0000FF" }) // Puedes personalizar el color
+      const createCustomMarker = (count) => {
+        const container = document.createElement("div");
+        container.className = "custom-marker";
+
+        // El icono del gimnasio (puedes usar un SVG o un Emoji)
+        container.innerHTML = `
+          <div class="marker-icon">🟠</div>
+          ${count > 0 ? `<div class="marker-badge">${count}</div>` : ""}
+        `;
+
+        return container;
+      };
+
+      const markerElement = createCustomMarker(Math.floor(Math.random() * 5) * 0); // + 0 para ver los badges aleatorios a modo de muestra
+
+      new maptilersdk.Marker({ element: markerElement }) //new maptilersdk.Marker({ color: "#0000FF" }) // Puedes personalizar el color
         .setLngLat([gym.longitud, gym.latitud])
         .setPopup(popup) //new maptilersdk.Popup().setHTML(`<h3>${gym.name}</h3>`)
         .addTo(map.current);
