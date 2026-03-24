@@ -160,7 +160,7 @@ const GymOwnerDashboardPage = () => {
           // );
           setGymsClasses(
             Object.entries(data).map(([id, count]) => ({
-              id: Number(id), // Convertimos la llave (string) a número
+              id: id, // Keep as string for UUID support
               count: count,
             })),
           );
