@@ -1,10 +1,10 @@
 -- 1. Borramos la función existente (incluyendo el tipo de parámetro)
 DROP FUNCTION IF EXISTS get_gyms_by_owner_santa_fe(uuid);
 
--- 2. Creamos la nueva versión con el esquema completo de la imagen
+-- 2. Creamos la nueva versión con el esquema completo corregido (id es uuid)
 CREATE OR REPLACE FUNCTION get_gyms_by_owner_santa_fe(owner_id_input uuid)
 RETURNS TABLE (
-  id int8,
+  id uuid,
   title text,
   total_score numeric,
   reviews_count int4,

@@ -1,10 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { supabase } from "../supabaseClient";
 
 const ClassCard = ({ classInfo, gymInfo, onBook, tabla }) => {
+  const [confirmedBookingsCount, setConfirmedBookingsCount] = useState(0);
+  const [loadingBookings, setLoadingBookings] = useState(true);
 
-  //  console.log("lo que recibe ClassCard:", classInfo, gymInfo, onBook)
+  useEffect(() => {
+    const fetchBookingsCount = async () => {
+      if (!classInfo?.id) return;
 
-if (!classInfo || !gymInfo || !onBook){return;}
+      try {
+        const tableName = tabla === "SantaFe" ? "bookings_santa_fe" : "bookings";
+        const { count, error } = await supabase
+          .from(tableName)
+          .select("*", { count: 'exact', head: true })
+          .eq("class_id", classInfo.id)
+          .eq("status", "confirmada");
+
+        if (!error) {
+          setConfirmedBookingsCount(count || 0);
+        }
+      } catch (err) {
+        console.error("Error fetching bookings count:", err);
+      } finally {
+        setLoadingBookings(false);
+      }
+    };
+
+    fetchBookingsCount();
+  }, [classInfo.id, tabla]);
+
+  if (!classInfo || !gymInfo || !onBook) {
+    return null;
+  }
 
   const startTime = new Date(classInfo.start_time).toLocaleTimeString([], {
     hour: "2-digit",
@@ -21,22 +49,23 @@ if (!classInfo || !gymInfo || !onBook){return;}
     year: "numeric",
   });
 
-  
   let resultGymName = "";
-  for (const gym of gymInfo) {
-    if (classInfo.gym_id == gym.id) {
-      tabla == "SantaFe" ? resultGymName = gym.title : resultGymName = gym.name;
+  if (Array.isArray(gymInfo)) {
+    const foundGym = gymInfo.find(g => g.id === classInfo.gym_id);
+    if (foundGym) {
+      resultGymName = tabla === "SantaFe" ? foundGym.title : foundGym.name;
     }
+  } else if (gymInfo.id === classInfo.gym_id) {
+    resultGymName = tabla === "SantaFe" ? gymInfo.title : gymInfo.name;
   }
 
-  // Determinar si la clase aún es reservable (ej. no ha pasado, o tiene cupos)
-  // Para este ejemplo, asumimos que todas son reservables si la fecha es futura.
-  const isReservable = new Date(classInfo.start_time) > new Date();
+  const actualCapacity = classInfo.capacity - confirmedBookingsCount;
+  const isReservable = new Date(classInfo.start_time) > new Date() && actualCapacity > 0;
 
   return (
     <div className="bg-gray shadow-1 br3 w-full sm:w-72 flex flex-column justify-between ma2">
-      <h3 className="ma1 pa1 f4 mv0 withe">{classInfo.name}</h3>
-      <h4 className="ma1 pa1 f4 mv0 withe">{resultGymName}</h4>
+      <h3 className="ma1 pa1 f4 mv0 white">{classInfo.name}</h3>
+      <h4 className="ma1 pa1 f4 mv0 white">{resultGymName}</h4>
       <p className="ma1 f6 mt2">{classInfo.description}</p>
       <p className="ma1 f6 mt2">
         <strong>Fecha:</strong> {startDate}
@@ -45,7 +74,7 @@ if (!classInfo || !gymInfo || !onBook){return;}
         <strong>Horario:</strong> {startTime} - {endTime}
       </p>
       <p className="ma1 f6">
-        <strong>Cupos disponibles:</strong> {classInfo.capacity}
+        <strong>Cupos disponibles:</strong> {loadingBookings ? "Cargando..." : actualCapacity} / {classInfo.capacity}
       </p>
       {isReservable ? (
         <button
@@ -55,7 +84,13 @@ if (!classInfo || !gymInfo || !onBook){return;}
           Reservar
         </button>
       ) : (
-        <p className="ma1 f6 gray mt3">Clase no disponible o pasada.</p>
+        <p className="ma1 f6 gray mt3">
+          {new Date(classInfo.start_time) <= new Date() 
+            ? "Clase pasada." 
+            : actualCapacity <= 0 
+              ? "Sin cupos disponibles." 
+              : "No disponible."}
+        </p>
       )}
     </div>
   );

@@ -1,0 +1,1 @@
+npx.cmd supabase db dump --db-url postgresql://postgres:-C-qsrs9a8FfePK@db.ougtipazurskmbtasbfl.supabase.co:5432/postgres -s public > esquema_completo_gymhub_rev00.sql
