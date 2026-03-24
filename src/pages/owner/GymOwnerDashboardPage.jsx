@@ -9,12 +9,13 @@ import { animateScroll as scroll } from "react-scroll"; // Alias para mayor como
 const GymOwnerDashboardPage = () => {
   const { session } = useAuth();
   const [gym, setGym] = useState([]); // Para almacenar el gimnasio asociado al propietario
+  const [selectedGymId, setSelectedGymId] = useState(""); 
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [gymsClasses, setGymsClasses] = useState([]);
 
-  // --- Formulario para añadir/editar clases ---
+  // ... Formulario para añadir/editar clases ---
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [currentClass, setCurrentClass] = useState(null); // Para editar una clase existente
   const [className, setClassName] = useState("");
@@ -135,6 +136,7 @@ const GymOwnerDashboardPage = () => {
           return;
         }
         setGym(gymData);
+        setSelectedGymId(gymData[0].id);
 
         // 3. Fetch classes for this gym
         const { data: classesData, error: classesError } = await supabase
@@ -401,31 +403,25 @@ const GymOwnerDashboardPage = () => {
   };
 
   const handleGymChange = (e) => {
-    // const selectedId = e.target.value;
-    const selectedId = parseInt(e.target.value, 10);
-    // console.log("el id del Gym elegido es:", selectedId, gym);
-    setGymSeleccionadoClassEdit(e.target.value);
-    // 1. Buscamos el objeto completo en nuestro array original usando el ID
-    const gymData = gym.find((gym) => gym.id === selectedId);
+    const selectedId = e.target.value;
+    setGymSeleccionadoClassEdit(selectedId);
+    
+    const gymData = gym.find((g) => g.id === selectedId);
 
-    // console.log("el nombre del gym elegido es:", gymData);
-
-    // 2. Actualizamos el estado con ambos valores
     if (gymData) {
       setFormData({
         ...formData,
         gymId: gymData.id,
-        gymName: gymData.name, // Ahora guardamos el nombre también
+        gymName: gymData.title || gymData.name,
       });
     } else {
-      // Si selecciona la opción vacía, limpiamos los campos
       setFormData({ ...formData, gymId: "", gymName: "" });
     }
   };
 
   const handleMisClasesGymChange = async (e) => {
-    const selectedId = parseInt(e.target.value, 10);
-    // console.log("el id del Gym elegido para mostrar clases:", selectedId, gym);
+    const selectedId = e.target.value;
+    setSelectedGymId(selectedId);
 
     const { data: updatedClasses, error: fetchError } = await supabase
       .from("classes_santa_fe")
@@ -594,33 +590,36 @@ const GymOwnerDashboardPage = () => {
           {Array.isArray(gym) &&
             !loading &&
             !error &&
-            gym.map((gymInter, i) => (
-              <div
-                key={gymInter.id}
-                className="bg-gray shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc flex flex-column justify-between"
-              >
-                {/* {console.log("Clases de los gyms con formato: ", gym)} */}
-                <GymCardDash
-                  gymInfo={gymInter}
-                  cantClases={gymsClasses[i].id == gymInter.id? gymsClasses[i] : {"id": gymInter.id , "count": "0"}}
-                  // Dummy onBook for ahora, actual logic will be handled later or if class is booked from gym page
-                />
-                <div className="mt3 flex justify-center gap-2">
-                  <button
-                    onClick={() => openFormForEditGym(gymInter)}
-                    className="bn ph3 pv2 input-reset ba b--blue bg-blue grow pointer f6 dib br2 white"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => handleDeleteGym(gymInter.id)}
-                    className="bn ph3 pv2 input-reset ba b--red bg-red grow pointer f6 dib br2 white"
-                  >
-                    Eliminar
-                  </button>
+            gym.map((gymInter) => {
+              // Buscar el conteo para este gym específico
+              const countData = gymsClasses.find(c => c.id === gymInter.id) || { id: gymInter.id, count: 0 };
+              
+              return (
+                <div
+                  key={gymInter.id}
+                  className="bg-gray shadow-1 br3 pa3 ma3 w-100 w-40-m w-30-l tc flex flex-column justify-between"
+                >
+                  <GymCardDash
+                    gymInfo={gymInter}
+                    cantClases={countData}
+                  />
+                  <div className="mt3 flex justify-center gap-2">
+                    <button
+                      onClick={() => openFormForEditGym(gymInter)}
+                      className="bn ph3 pv2 input-reset ba b--blue bg-blue grow pointer f6 dib br2 white"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDeleteGym(gymInter.id)}
+                      className="bn ph3 pv2 input-reset ba b--red bg-red grow pointer f6 dib br2 white"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
         </div>
       </div>
 
@@ -634,20 +633,22 @@ const GymOwnerDashboardPage = () => {
             + Añadir Clase
           </button>
         </h2>
-        <select
-          name="gymId" // Importante para identificar el campo
-          value={gym.id}
-          onChange={handleMisClasesGymChange}
-          required
-          className="w-full p-2 border border-gray-300 rounded"
-        >
-          {/* <option value="">Seleccioná uno...</option> */}
-          {gym.map((gym) => (
-            <option key={gym.id} value={gym.id}>
-              {gym.title}
-            </option>
-          ))}
-        </select>
+        <div className="mb3 mw6 center">
+          <label className="db mb2 fw6">Filtrar por Gimnasio:</label>
+          <select
+            name="gymIdSelector"
+            value={selectedGymId}
+            onChange={handleMisClasesGymChange}
+            required
+            className="w-full p-2 border border-gray-300 rounded"
+          >
+            {gym.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.title}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {isFormOpen && (
           <div className="measure center pa4 bg-gray shadow-1 br2 mb4">
