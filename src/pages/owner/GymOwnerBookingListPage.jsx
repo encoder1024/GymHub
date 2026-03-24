@@ -5,7 +5,8 @@ import { CrudDelete } from "../../services/supaCrud";
 
 const GymOwnerBookingListPage = () => {
   const { session } = useAuth();
-  const [gym, setGym] = useState(null);
+  const [gyms, setGyms] = useState([]);
+  const [selectedGymIndex, setSelectedGymIndex] = useState(0);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,8 +28,6 @@ const GymOwnerBookingListPage = () => {
           .eq("id", session.user.id)
           .single();
 
-        // console.log(session.user.id, profileData.role);
-
         if (profileError) throw profileError;
 
         if (!profileData || profileData.role !== "owner") {
@@ -39,36 +38,20 @@ const GymOwnerBookingListPage = () => {
 
         const urlParams = new URLSearchParams(window.location.search);
         const gymIdfromMap = urlParams.get("id");
-        // console.log(gymIdfromMap); // Aquí tenés el valor pasado
 
+        let gymData;
         if (gymIdfromMap) {
-          const { data: gymData, error: gymError } = await supabase
+          const { data, error: gymError } = await supabase
             .from("gymsSantaFe")
             .select("*")
             .eq("owner_id", session.user.id)
             .eq("id", gymIdfromMap);
 
           if (gymError) throw gymError;
-          if (!gymData) {
-            setError("No se encontró un gimnasio asociado a tu cuenta.");
-            setLoading(false);
-            return;
-          }
-          setGym(gymData);
-          // console.log("estos son los arrays: ", gymData);
-
-          // 3. Fetch bookings for classes belonging to this gym
-          const { data: bookingsData, error: bookingsError } =
-            await supabase.rpc("get_confirmed_gym_bookings_santa_fe", {
-              target_gym_id: gymData[0].id,
-            });
-          // console.log("el gym con las clases de las reservas: ", bookingsData);
-
-          if (bookingsError) throw bookingsError;
-          setBookings(bookingsData);
+          gymData = data;
         } else {
-          // 2. Fetch the gym associated with this owner
-          const { data: gymData, error: gymError } = await supabase
+          // 2. Fetch the gyms associated with this owner
+          const { data, error: gymError } = await supabase
             .from("gymsSantaFe")
             .select("*")
             .eq("owner_id", session.user.id)
@@ -76,23 +59,32 @@ const GymOwnerBookingListPage = () => {
             .eq("is_approved", true);
 
           if (gymError) throw gymError;
-          if (gymData.length < 1) {
-            setError("No se encontró un gimnasio asociado a tu cuenta.");
-            setLoading(false);
-            return;
-          }
-          setGym(gymData);
-
-          // 3. Fetch bookings for classes belonging to this gym
-          console.log(gymData);
-          const { data: bookingsData, error: bookingsError } =
-            await supabase.rpc("get_confirmed_gym_bookings_santa_fe", {
-              target_gym_id: gymData[0].id,
-            });
-          // console.log("el gym con las clases de las reservas: ", bookingsData);
-          if (bookingsError) throw bookingsError;
-          setBookings(bookingsData);
+          gymData = data;
         }
+
+        if (!gymData || gymData.length < 1) {
+          setError("No se encontró un gimnasio asociado a tu cuenta.");
+          setLoading(false);
+          return;
+        }
+
+        setGyms(gymData);
+        
+        // Find index of gymIdfromMap if present, else default to 0
+        const initialIndex = gymIdfromMap 
+          ? gymData.findIndex(g => g.id === gymIdfromMap) 
+          : 0;
+        setSelectedGymIndex(initialIndex >= 0 ? initialIndex : 0);
+
+        // 3. Fetch bookings for classes belonging to the selected gym
+        const { data: bookingsData, error: bookingsError } =
+          await supabase.rpc("get_confirmed_gym_bookings_santa_fe", {
+            target_gym_id: gymData[initialIndex >= 0 ? initialIndex : 0].id,
+          });
+
+        if (bookingsError) throw bookingsError;
+        setBookings(bookingsData);
+
       } catch (error) {
         setError(error.message);
         console.error("Error fetching data:", error);
@@ -106,16 +98,20 @@ const GymOwnerBookingListPage = () => {
 
   const handleMisReservasGymChange = async (e) => {
     const selectedId = parseInt(e.target.value, 10);
+    setSelectedGymIndex(selectedId);
 
     const { data: updatedBookings, error: fetchError } = await supabase.rpc(
       "get_confirmed_gym_bookings_santa_fe",
       {
-        target_gym_id: gym[selectedId].id,
+        target_gym_id: gyms[selectedId].id,
       },
     );
 
-    if (!fetchError) setBookings(updatedBookings);
-    // console.log("las reservas actualizadas: ", updatedBookings);
+    if (!fetchError) {
+      setBookings(updatedBookings);
+    } else {
+      console.error("Error fetching updated bookings:", fetchError);
+    }
   };
 
   const handleDeleteBooking = async (bookId) => {
@@ -133,36 +129,38 @@ const GymOwnerBookingListPage = () => {
   return (
     <div className="pa4">
       <h1 className="f2 tc mb4">Reservas de Mis Clases</h1>
-      {!loading && !error && !gym && (
-        <select
-          name="gymId" // Importante para identificar el campo
-          value={gym.id}
-          onChange={handleMisReservasGymChange}
-          required
-          className="w-full p-2 border border-gray-300 rounded"
-        >
-          {/* <option value="">Seleccioná uno...</option> */}
-          {gym.map((gym, i) => (
-            <option key={gym.id} value={i}>
-              {gym.name}
-            </option>
-          ))}
-        </select>
+      
+      {!loading && !error && gyms.length > 0 && (
+        <div className="mb4 mw6 center">
+          <label className="db mb2 fw6">Seleccionar Gimnasio:</label>
+          <select
+            name="gymId"
+            value={selectedGymIndex}
+            onChange={handleMisReservasGymChange}
+            required
+            className="w-100 p2 border border-gray-300 rounded ba b--light-gray"
+          >
+            {gyms.map((g, i) => (
+              <option key={g.id} value={i}>
+                {g.title || g.name}
+              </option>
+            ))}
+          </select>
+        </div>
       )}
 
-      {loading && <p>Cargando reservas...</p>}
-      {error && <p className="f6 red">{error}</p>}
+      {loading && <p className="tc">Cargando reservas...</p>}
+      {error && <p className="tc f6 red">{error}</p>}
 
-      {!loading && !error && !gym && (
+      {!loading && !error && gyms.length === 0 && (
         <p className="tc">No tienes un gimnasio asociado.</p>
       )}
 
-      {!loading && !error && gym && bookings.length === 0 && (
-        <p className="tc">Aún no hay reservas para tus clases.</p>
+      {!loading && !error && gyms.length > 0 && bookings.length === 0 && (
+        <p className="tc">Aún no hay reservas para las clases de {gyms[selectedGymIndex].title || gyms[selectedGymIndex].name}.</p>
       )}
 
-      {/* {console.log("bookings: ", bookings)} */}
-      {!loading && !error && gym && bookings.length > 0 && (
+      {!loading && !error && gyms.length > 0 && bookings.length > 0 && (
         <div className="flex flex-wrap justify-center">
           {bookings.map((booking) => (
             <div
