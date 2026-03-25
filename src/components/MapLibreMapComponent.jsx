@@ -190,7 +190,10 @@ export default function MapTilerComponent({ gymsArray }) {
 
         // El icono del gimnasio (puedes usar un SVG o un Emoji)
         container.innerHTML = `
-          <div class="marker-icon">🟠</div>
+          ${gym.image_url
+            ? `<div class="marker-icon">🟢</div>`
+            : `<div class="marker-icon">🟠</div>`
+          }
           ${count > 0 ? `<div class="marker-badge">${count}</div>` : ""}
         `;
 
