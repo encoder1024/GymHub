@@ -107,6 +107,11 @@ export default function MapTilerComponent({ gymsArray }) {
 
       // 2. Inyectamos el texto (puedes seguir usando template strings para el texto)
       div.innerHTML = `
+        ${
+          gym.image_url
+            ? `<img src="${gym.image_url}" alt="${gym.title}" style="width:100%; height:auto; border-radius:5px; margin-bottom:10px;" />`
+            : `<div style="width:100%; height:100px; background:#eee; display:flex; align-items:center; justify-center; border-radius:5px; margin-bottom:10px;">Sin imagen</div>`
+        }
         <h3 style="margin:0;">${gym.title}</h3>
         <p style="margin:5px 0;">${gym.category_name}</p>
         <p style="margin:5px 0;">${gym.phone}</p>
@@ -185,14 +190,19 @@ export default function MapTilerComponent({ gymsArray }) {
 
         // El icono del gimnasio (puedes usar un SVG o un Emoji)
         container.innerHTML = `
-          <div class="marker-icon">🟠</div>
+          ${gym.image_url
+            ? `<div class="marker-icon">🟢</div>`
+            : `<div class="marker-icon">🟠</div>`
+          }
           ${count > 0 ? `<div class="marker-badge">${count}</div>` : ""}
         `;
 
         return container;
       };
 
-      const markerElement = createCustomMarker(Math.floor(Math.random() * 5) * 0); // + 0 para ver los badges aleatorios a modo de muestra
+      const markerElement = createCustomMarker(
+        Math.floor(Math.random() * 5) * 0,
+      ); // + 0 para ver los badges aleatorios a modo de muestra
 
       new maptilersdk.Marker({ element: markerElement }) //new maptilersdk.Marker({ color: "#0000FF" }) // Puedes personalizar el color
         .setLngLat([gym.longitud, gym.latitud])
